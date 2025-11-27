@@ -1,0 +1,2 @@
+F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\drivers/fsl_clock.h:580:20:CLOCK_Select	16	static
+../board/board.c:25:10:BOARD_InitDebugConsole	16	static

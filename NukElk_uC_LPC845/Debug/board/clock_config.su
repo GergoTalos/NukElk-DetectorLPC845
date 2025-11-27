@@ -1,0 +1,10 @@
+F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\drivers/fsl_clock.h:580:20:CLOCK_Select	16	static
+F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\drivers/fsl_clock.h:591:20:CLOCK_SetClkDivider	16	static
+F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\drivers/fsl_clock.h:612:20:CLOCK_SetCoreSysClkDiv	16	static
+F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\drivers/fsl_clock.h:841:20:CLOCK_SetFroOscFreq	16	static
+F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\drivers/fsl_power.h:153:20:POWER_DisablePD	16	static
+../board/clock_config.c:36:6:BOARD_InitBootClocks	8	static
+../board/clock_config.c:70:6:BOARD_BootClockFRO18M	8	static
+../board/clock_config.c:115:6:BOARD_BootClockFRO24M	8	static
+../board/clock_config.c:167:6:BOARD_BootClockFRO30M	8	static
+../board/clock_config.c:217:6:BOARD_BootClockPll24M	16	static

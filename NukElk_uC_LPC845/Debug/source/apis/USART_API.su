@@ -1,0 +1,8 @@
+F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\drivers/fsl_usart.h:415:20:USART_EnableInterrupts	16	static
+F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\drivers/fsl_usart.h:432:20:USART_DisableInterrupts	16	static
+../source/apis/USART_API.c:64:6:INIT_USART	8	static
+../source/apis/USART_API.c:69:6:PrintUSART0_NB	24	static
+../source/apis/USART_API.c:81:9:GetUSART0	24	static
+../source/apis/USART_API.c:109:9:GetString_TillEndChar	32	static
+../source/apis/USART_API.c:184:8:arith	48	static
+../source/apis/USART_API.c:230:9:USART_parse	80	static

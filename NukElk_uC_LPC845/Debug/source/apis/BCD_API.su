@@ -1,0 +1,5 @@
+F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\drivers/fsl_gpio.h:153:20:GPIO_PinWrite	24	static
+../source/apis/BCD_API.c:62:9:BCD_digit	32	static
+../source/apis/BCD_API.c:78:9:BCD_pint2	32	static
+../source/apis/BCD_API.c:97:6:BCD_blank	8	static
+../source/apis/BCD_API.c:108:6:BCD_init	8	static

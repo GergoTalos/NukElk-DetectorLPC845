@@ -1,0 +1,6 @@
+../source/ic_drivers/M24C32_EEPROM_I2C.c:20:9:M24C32_byte_write	40	static
+../source/ic_drivers/M24C32_EEPROM_I2C.c:47:9:M24C32_page_write	40	static
+../source/ic_drivers/M24C32_EEPROM_I2C.c:73:9:M24C32_curr_addr_read	32	static
+../source/ic_drivers/M24C32_EEPROM_I2C.c:95:9:M24C32_rand_addr_read	40	static
+../source/ic_drivers/M24C32_EEPROM_I2C.c:128:9:M24C32_seq_curr_addr_read	32	static
+../source/ic_drivers/M24C32_EEPROM_I2C.c:151:9:M24C32_seq_rand_addr_read	40	static
