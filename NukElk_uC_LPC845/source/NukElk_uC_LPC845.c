@@ -74,6 +74,7 @@ void SysTick_Handler(void) {
  * 0x04: Oled disp.
  * 0x08: 7seg disp.
  * 0x10: siren
+ * 0x20: NIX
  * 0x40: math
  * 0x80: USART login granted
  */
@@ -97,20 +98,75 @@ void read_cps(volatile uint32_t *cps);
 void write_mA(volatile uint32_t *vars);
 void meth(volatile uint32_t *vars);
 uint8_t check_vars(volatile uint32_t *vars, double *value, Vars_name name);
+uint8_t set_vars(volatile uint32_t *vars, double value, Vars_name name);
+void display_texts(char* banner, char* cps_string, char* dac_string);
 
-/* MRT0_IRQn interrupt handler, triggers every 1s */
+/* MRT0_IRQn interrupt handler, triggers every 1s, stops, then resets the CTimer. */
 void MRT0_IRQHANDLER(void) {
 	 __DSB();//Memory access boundary for the cpu
 	CTIMER_StopTimer(CTIMER0_PERIPHERAL);
 	if (en_reg & 0x01) {
 		read_cps(vars+cps);
 	}
+	CTIMER_Reset(CTIMER0_PERIPHERAL);
 	GPIO_PortToggle(BOARD_INITLEDSPINS_LED_RED_GPIO, BOARD_INITLEDSPINS_LED_RED_PORT, BOARD_INITLEDSPINS_LED_RED_PIN_MASK);
 	// Clear IRQ
+	CTIMER_StartTimer(CTIMER0_PERIPHERAL);
 	MRT_ClearStatusFlags(MRT0_PERIPHERAL, MRT0_CHANNEL_0, kMRT_TimerInterruptFlag);
 	__DSB();//Memory access boundary for the cpu
 }
 
+uint8_t set_vars(volatile uint32_t *vars, double dvalue, Vars_name name) {
+	uint8_t ret = 0;
+	double tmp = ((vars[max_mA_cps]-vars[min_mA_cps])/(1024-vars[min_offset_D]));
+	switch(name) {
+		case cps:
+		case siren_cps:
+		case min_mA_cps:
+		case max_mA_cps:
+			vars[name] = (uint32_t)(dvalue);
+			ret = 1;
+			break;
+		case min_offset_V:
+			vars[min_offset_V] = (uint32_t)dvalue;
+			vars[min_offset_D] = (dvalue/100/(VREFP_MA_OUT_V/1024));
+			ret = 1;
+			break;
+		case min_offset_D:
+			vars[min_offset_D] = (uint32_t)dvalue;
+			vars[min_offset_V] = floor(dvalue*(VREFP_MA_OUT_V/1024));
+			ret = 1;
+			break;
+		case out_value_reg: //calc out_value_V and ..._D
+			vars[out_value_reg] = floor(dvalue);
+			dvalue *= (VREFP_MA_OUT_V/1024);
+			vars[out_value_V] = floor(dvalue*100);
+			vars[out_value_mA] = ceil(((dvalue-MIN_MA_OUT_V)/(MAX_MA_OUT_V-MIN_MA_OUT_V))*16+4);
+			ret = 1;
+			break;
+		case out_value_V: //calc out_value_reg and ..._mA
+			vars[out_value_V] = (uint32_t)dvalue;
+			dvalue /= 100;
+			vars[out_value_mA] = ceil(((dvalue-MIN_MA_OUT_V)/(MAX_MA_OUT_V-MIN_MA_OUT_V))*16+4);
+			dvalue /= (VREFP_MA_OUT_V/1024);
+			//double tmp = ((vars[max_mA_cps]-vars[min_mA_cps])/(1024-vars[min_offset_D]));
+			vars[out_value_reg] = floor((dvalue-vars[min_offset_D])*tmp);
+			ret = 1;
+			break;
+		case out_value_mA: //calc out_value_reg and ..._V
+			vars[out_value_mA] = (uint32_t)dvalue;
+			dvalue = (((dvalue-4)/16)*(MAX_MA_OUT_V-MIN_MA_OUT_V)+MIN_MA_OUT_V);
+			vars[out_value_V] = floor(dvalue*100);
+			dvalue /= (VREFP_MA_OUT_V/1024);
+			//double tmp = ((vars[max_mA_cps]-vars[min_mA_cps])/(1024-vars[min_offset_D]));
+			vars[out_value_reg] = floor(dvalue);//floor((dvalue-vars[min_offset_D])*tmp);
+			ret = 1;
+			break;
+		default:
+			break;
+		}
+	return ret;
+}
 
 uint8_t check_vars(volatile uint32_t *vars, double *dvalue, Vars_name name) {
 	uint8_t ret = 0;
@@ -187,7 +243,7 @@ void meth(volatile uint32_t *vars) {
 	}
 	// Corrected cps for  between min and max cps with offset.
 	// CAN BE OVER 1023, but the DAC's max is 1023.
-	double tmp = ((vars[max_mA_cps]-vars[min_mA_cps])/(1024-min_offset_D));
+	double tmp = ((vars[max_mA_cps]-vars[min_mA_cps])/(1024-vars[min_offset_D]));
 	out_val = (out_val/tmp)+vars[min_offset_D];
 	vars[out_value_reg] = floor(out_val);
 	// Value in Volts on the pin XX with one decimal.
@@ -207,20 +263,18 @@ void write_mA(volatile uint32_t *vars) {
 }
 
 /**
- * Reads and resets CTimer for the number of counts counted by the timer on pin XX.
+ * Reads the number of counts counted by the timer on pin XX.
  */
 void read_cps(volatile uint32_t *cps) {
-	//CTIMER_StopTimer(CTIMER0_PERIPHERAL);
 	signal = 1;
 	*cps = (uint32_t)CTIMER_GetTimerCountValue(CTIMER0_PERIPHERAL);
 	signal = 0;
-	CTIMER_Reset(CTIMER0_PERIPHERAL);
-	CTIMER_StartTimer(CTIMER0_PERIPHERAL);
 }
 
-void display_texts(char* banner, char* cps_string) {
+void display_texts(char* banner, char* cps_string, char* dac_string) {
     OLED_print_string(7,0, banner);
     OLED_print_string(7,3, cps_string);
+    OLED_print_string(7,4, dac_string);
 }
 
 /**
@@ -247,9 +301,10 @@ int main(void) {
 
     /* Init Oled display */
     char banner[22] = "Nuclear Electronics";
-    char cps_string[5] = "cps:";
+    char cps_string[5] = "CPS:";
+    char dac_string[7] = "DAC V:";
     OLED_init();
-    display_texts(banner,cps_string);
+    display_texts(banner,cps_string,dac_string);
 
     /* Init USART */
 	char str_in[USART_IN_LEN_MAX];
@@ -262,8 +317,8 @@ int main(void) {
 "\tout_val_R:\r\n"
 "\tout_val_V:\r\n"
 "\tout_val_mA:\r\n"
-"\tmin_offset_V:\r\n"
 "\tmin_offset_D:\r\n"
+"\tmin_offset_V:\r\n"
 "\tsiren_cps:\r\n"
 "Enabled:\r\n"
 "\tcps_in:\r\n"
@@ -271,10 +326,12 @@ int main(void) {
 "\toled:\r\n"
 "\t7segment:\r\n"
 "\tsiren:\r\n"
+"\tNIX:\r\n"
+"\tmath:\r\n"
 "\tUSART:\r\n";
 	char usart_values [250] = "\x1b[ ? 25 l"
 "\x1b[s"
-"\x1b[16A"
+"\x1b[18A"
 "\x1b[25G"
 "%5d"
 "\x1b[1B"
@@ -294,15 +351,21 @@ int main(void) {
 "%5d"
 "\x1b[1B"
 "\x1b[25G"
-"%5.2f"
+"%5d"
 "\x1b[1B"
 "\x1b[25G"
-"%5d"
+"%5.2f"
 "\x1b[1B"
 "\x1b[25G"
 "%5d"
 
 "\x1b[2B"
+"\x1b[29G"
+"%1hd"
+"\x1b[1B"
+"\x1b[29G"
+"%1hd"
+"\x1b[1B"
 "\x1b[29G"
 "%1hd"
 "\x1b[1B"
@@ -335,8 +398,8 @@ int main(void) {
 	vars[out_value_V] = 0;
 	vars[out_value_mA] = 0;
 	// Calculate from the given minimum voltage the offset of the dac's output_value
-	vars[min_offset_V] = MIN_MA_OUT_V;
-	vars[min_offset_D] = (MIN_MA_OUT_V/(VREFP_MA_OUT_V/1024))*100;
+	vars[min_offset_V] = MIN_MA_OUT_V; //volts_irl*100
+	vars[min_offset_D] = floor((MIN_MA_OUT_V/(VREFP_MA_OUT_V/1024))*100);
 	// Sounds the siren if exceeded
 	vars[siren_cps] = SIREN_CPS;
 
@@ -367,6 +430,8 @@ int main(void) {
 			}
 			if (en_reg & 0x04) { // OLED
 				OLED_print_int(37,3, vars[cps]); //(signed long)
+				float tmp = vars[out_value_V]/100;
+				OLED_print_float(37,4, tmp,2); //(signed long)
 			}
 			else {
 				OLED_clear_screen();
@@ -377,6 +442,19 @@ int main(void) {
 			else {
 				BCD_blank();
 			}
+        	/* Enable Siren */
+        	GPIO_PinWrite(SIREN_T_GPIO,SIREN_T_PORT,SIREN_T_PIN,(en_reg & 0x10) >> 4); //Shift, 'cause only accepts 0 and 1.
+			/*if (en_reg & 0x10) {
+				if (siren_counter == 0U) {
+					SCTIMER_UpdatePwmDutycycle(SCT0_PERIPHERAL, kSCTIMER_Out_3, siren_percent, SCT0_pwmEvent[1]);
+					siren_percent ^= 0x02;
+				}
+				else { // Turn siren off
+					SCTIMER_UpdatePwmDutycycle(SCT0_PERIPHERAL, kSCTIMER_Out_3, 0, SCT0_pwmEvent[1]);
+				}
+				siren_counter = LOOP_INTERVAL; //Reset Loop interval
+        	}
+			*/
 			/* Check USART, when SysTick counter usart is zero */
 			if (usart_counter == 0U) {
 				/* Process USART */
@@ -430,14 +508,15 @@ int main(void) {
 							else if (code > 59) { // Enable or disable a function
 								en_reg ^= (0x01 << (code-60)); // Toggles a function
 								if (code == 62) { // On oled enable
-								    display_texts(banner,cps_string);
+								    display_texts(banner, cps_string, dac_string);
 								}
 								strcpy(special,"\r\n\tFunction has been dis/enabled!\r\n\r\n");
 							}
 							else if (code > 29) { //set a parameter
 								code -= 30;
 								if (check_vars(vars, &new_value, code)) { //Checks validity
-									vars[code] = (uint32_t)new_value; // sets new value
+									set_vars(vars, new_value, code);
+									//vars[code] = (uint32_t)new_value; // sets new value
 									strcpy(special,"\r\n\tParameter has been set!\r\n\r\n");
 								}
 								else {
@@ -450,19 +529,6 @@ int main(void) {
 				}
 				usart_counter = USART_INTERVAL; // Reset upon finished round
 			}
-        	/* Enable Siren */
-        	GPIO_PinWrite(SIREN_T_GPIO,SIREN_T_PORT,SIREN_T_PIN,(en_reg & 0x10) >> 4); //Shift, 'cause only accepts 0 and 1.
-			/*if (en_reg & 0x10) {
-				if (siren_counter == 0U) {
-					SCTIMER_UpdatePwmDutycycle(SCT0_PERIPHERAL, kSCTIMER_Out_3, siren_percent, SCT0_pwmEvent[1]);
-					siren_percent ^= 0x02;
-				}
-				else { // Turn siren off
-					SCTIMER_UpdatePwmDutycycle(SCT0_PERIPHERAL, kSCTIMER_Out_3, 0, SCT0_pwmEvent[1]);
-				}
-				siren_counter = LOOP_INTERVAL; //Reset Loop interval
-        	}
-			*/
         	//loop continuation
         	/* Display USART */
         	if (en_reg & 0x80) {
@@ -587,14 +653,16 @@ int main(void) {
 					vars[out_value_reg],
 					tmp0,
 					vars[out_value_mA],
-					tmp1,
 					vars[min_offset_D],
+					tmp1,
 					vars[siren_cps],
 					(en_reg & 0x01),
 					((en_reg & 0x02) >> 1),
 					((en_reg & 0x04) >> 2),
 					((en_reg & 0x08) >> 3),
 					((en_reg & 0x10) >> 4),
+					((en_reg & 0x20) >> 5),
+					((en_reg & 0x40) >> 6),
 					((en_reg & 0x80) >> 7)
 						 );
 				PrintUSART0_NB(str_out);

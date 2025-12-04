@@ -4,17 +4,14 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../source/ic_drivers/M24C32_EEPROM_I2C.c \
 ../source/ic_drivers/SSD1309.c \
 ../source/ic_drivers/fonts.c 
 
 C_DEPS += \
-./source/ic_drivers/M24C32_EEPROM_I2C.d \
 ./source/ic_drivers/SSD1309.d \
 ./source/ic_drivers/fonts.d 
 
 OBJS += \
-./source/ic_drivers/M24C32_EEPROM_I2C.o \
 ./source/ic_drivers/SSD1309.o \
 ./source/ic_drivers/fonts.o 
 
@@ -31,7 +28,7 @@ source/ic_drivers/%.o: ../source/ic_drivers/%.c source/ic_drivers/subdir.mk
 clean: clean-source-2f-ic_drivers
 
 clean-source-2f-ic_drivers:
-	-$(RM) ./source/ic_drivers/M24C32_EEPROM_I2C.d ./source/ic_drivers/M24C32_EEPROM_I2C.o ./source/ic_drivers/SSD1309.d ./source/ic_drivers/SSD1309.o ./source/ic_drivers/fonts.d ./source/ic_drivers/fonts.o
+	-$(RM) ./source/ic_drivers/SSD1309.d ./source/ic_drivers/SSD1309.o ./source/ic_drivers/fonts.d ./source/ic_drivers/fonts.o
 
 .PHONY: clean-source-2f-ic_drivers
 

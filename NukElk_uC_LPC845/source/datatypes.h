@@ -10,7 +10,6 @@
 #define DATATYPES_H_
 
 
-#define EEPROM_WAIT 6000 //cycles
 
 /**
  * The CPU is in active wait for cyc cycles. (Plus the stack and in function operations time.)

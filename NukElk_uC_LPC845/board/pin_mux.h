@@ -422,26 +422,6 @@ void DispPins(void); /* Function assigned for the Cortex-M0P */
  */
 void BCDPins(void); /* Function assigned for the Cortex-M0P */
 
-/*! @name I2C0_SCL (number 13), CN1[23]/PIO0_10/I2C0_SCL
-  @{ */
-#define I2C_SCL_PORT 0U                   /*!<@brief PORT device index: 0 */
-#define I2C_SCL_PIN 10U                   /*!<@brief PORT pin number */
-#define I2C_SCL_PIN_MASK (1U << 10U)      /*!<@brief PORT pin mask */
-                                          /* @} */
-
-/*! @name I2C0_SDA (number 12), CN1[24]/PIO0_11/I2C0_SDA
-  @{ */
-#define I2C_SDA_PORT 0U                   /*!<@brief PORT device index: 0 */
-#define I2C_SDA_PIN 11U                   /*!<@brief PORT pin number */
-#define I2C_SDA_PIN_MASK (1U << 11U)      /*!<@brief PORT pin mask */
-                                          /* @} */
-
-/*!
- * @brief Configures pin routing and optionally pin electrical features.
- *
- */
-void I2CpPins(void); /* Function assigned for the Cortex-M0P */
-
 /*!
  * @brief Selects function mode (on-chip pull-up/pull-down resistor control).: Pull-up. Pull-up resistor enabled. */
 #define PIO0_6_MODE_PULL_UP 0x02u
@@ -468,8 +448,12 @@ void SPEAKPins(void); /* Function assigned for the Cortex-M0P */
  * @brief DAC mode enable.: Enable. */
 #define PIO0_17_DACMODE_ENABLE 0x01u
 /*!
- * @brief Selects function mode (on-chip pull-up/pull-down resistor control).: Pull-up. Pull-up resistor enabled. */
-#define PIO0_17_MODE_PULL_UP 0x02u
+ * @brief
+ * Selects function mode (on-chip pull-up/pull-down resistor control).
+ * : Pull-down.
+ * Pull-down resistor enabled.
+ */
+#define PIO0_17_MODE_PULL_DOWN 0x01u
 
 /*! @name DACOUT_0 (number 48), CN1[2]/PIO0_17/ADC_9/DACOUT_0
   @{ */

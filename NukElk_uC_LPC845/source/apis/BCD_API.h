@@ -11,6 +11,7 @@
 #include "stdint.h"
 
 /**
+ * Writes code to the BCD bus.
  * Lower 4 bits are used.
  */
 uint8_t BCD_digit(uint8_t digit);
@@ -21,7 +22,7 @@ uint8_t BCD_digit(uint8_t digit);
 uint8_t BCD_pint2(int8_t num);
 
 /**
- *
+ * Initialises the 7 segment display by lighting all the segments up, then blanking them.
  */
 void BCD_init(void);
 
@@ -31,17 +32,17 @@ void BCD_init(void);
 void BCD_blank(void);
 
 /**
- * Rising edge
+ * Counts up upon Rising edge
  */
 void BCD_cnt_up(void);
 
 /**
- * Rising edge
+ * Counts down upon Rising edge
  */
 void BCD_cnt_dw(void);
 
 /**
- * Rising edge
+ * Pulls the "clear" pin to clear the controller
  */
 void BCD_clr(void);
 

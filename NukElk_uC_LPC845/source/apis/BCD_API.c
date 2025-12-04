@@ -26,7 +26,7 @@
 #define BCD_C(X) GPIO_PinWrite(BCD_C_GPIO, BCD_C_PORT, BCD_C_PIN, X);
 #define BCD_D(X) GPIO_PinWrite(BCD_D_GPIO, BCD_D_PORT, BCD_D_PIN, X);
 
-/* Specific for the numbers of digits */
+/* Specific load pin for each display */
 #define BCD_LOAD_0(X) GPIO_PinWrite(BCD_LOAD_0_GPIO, BCD_LOAD_0_PORT, BCD_LOAD_0_PIN, X);
 #define BCD_LOAD_1(X) GPIO_PinWrite(BCD_LOAD_1_GPIO, BCD_LOAD_1_PORT, BCD_LOAD_1_PIN, X);
 
@@ -47,10 +47,10 @@
  * 	Latch data inputs setup time = min. 60ns
  * 	Hold time is 0ns (theoretically)
  */
-//#define BCD_BL(X) GPIO_PinWrite(BCD_BL_GPIO, BCD_BL_PORT, BCD_BL_PIN, X);
-#define BCD_LT(X) GPIO_PinWrite(BCD_LT_GPIO, BCD_LT_PORT, BCD_LT_PIN, X);
-#define BCD_DP_0(X) GPIO_PinWrite(BCD_DP_0_GPIO, BCD_DP_0_PORT, BCD_DP_0_PIN, X);
-//#define BCD_DP_1(X) GPIO_PinWrite(BCD_DP_1_GPIO, BCD_DP_1_PORT, BCD_DP_1_PIN, X);
+//#define BCD_BL(X) GPIO_PinWrite(BCD_BL_GPIO, BCD_BL_PORT, BCD_BL_PIN, X); // Blanking pin
+#define BCD_LT(X) GPIO_PinWrite(BCD_LT_GPIO, BCD_LT_PORT, BCD_LT_PIN, X); // Light Test pin
+#define BCD_DP_0(X) GPIO_PinWrite(BCD_DP_0_GPIO, BCD_DP_0_PORT, BCD_DP_0_PIN, X); // Decimal point pin
+//#define BCD_DP_1(X) GPIO_PinWrite(BCD_DP_1_GPIO, BCD_DP_1_PORT, BCD_DP_1_PIN, X); // Decimal point pin
 
 #define BLANK_CODE 13 //blanks the display
 #define BCD_DELAY 2 //~ 66ns, ~2 cycles at 30MHz
@@ -80,7 +80,7 @@ uint8_t BCD_pint2(int8_t num) {
 	if (num < 100 && num > -1) {
 		BCD_digit(num % 10);
 		BCD_LOAD_0(0);
-		num /= 10; // the cpu doesn't have to wait.
+		num /= 10; // the cpu doesn't have to wait for setup time
 		BCD_LOAD_0(1);
 		BCD_digit(num % 10);
 		BCD_LOAD_1(0);

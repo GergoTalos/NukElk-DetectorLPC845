@@ -64,7 +64,6 @@ void BOARD_InitBootPins(void)
     TIMERPins();
     DispPins();
     BCDPins();
-    I2CpPins();
     SPEAKPins();
     DACPins();
 }
@@ -684,40 +683,6 @@ void BCDPins(void)
 /* clang-format off */
 /*
  * TEXT BELOW IS USED AS SETTING FOR TOOLS *************************************
-I2CpPins:
-- options: {callFromInitBoot: 'true', prefix: '', coreID: core0, enableClock: 'true'}
-- pin_list:
-  - {pin_num: '13', peripheral: I2C0, signal: SCL, pin_signal: PIO0_10/I2C0_SCL, direction: OUTPUT}
-  - {pin_num: '12', peripheral: I2C0, signal: SDA, pin_signal: PIO0_11/I2C0_SDA}
- * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
- */
-/* clang-format on */
-
-/* FUNCTION ************************************************************************************************************
- *
- * Function Name : I2CpPins
- * Description   : Configures pin routing and optionally pin electrical features.
- *
- * END ****************************************************************************************************************/
-/* Function assigned for the Cortex-M0P */
-void I2CpPins(void)
-{
-    /* Enables clock for switch matrix.: enable */
-    CLOCK_EnableClock(kCLOCK_Swm);
-
-    /* I2C0_SDA connect to P0_11 */
-    SWM_SetFixedPinSelect(SWM0, kSWM_I2C0_SDA, true);
-
-    /* I2C0_SCL connect to P0_10 */
-    SWM_SetFixedPinSelect(SWM0, kSWM_I2C0_SCL, true);
-
-    /* Disable clock for switch matrix. */
-    CLOCK_DisableClock(kCLOCK_Swm);
-}
-
-/* clang-format off */
-/*
- * TEXT BELOW IS USED AS SETTING FOR TOOLS *************************************
 SPEAKPins:
 - options: {callFromInitBoot: 'true', prefix: '', coreID: core0, enableClock: 'true'}
 - pin_list:
@@ -771,7 +736,7 @@ void SPEAKPins(void)
 DACPins:
 - options: {callFromInitBoot: 'true', prefix: '', coreID: core0, enableClock: 'true'}
 - pin_list:
-  - {pin_num: '48', peripheral: DAC0, signal: DACOUT0, pin_signal: PIO0_17/ADC_9/DACOUT_0, mode: pullUp, dacmode: enabled}
+  - {pin_num: '48', peripheral: DAC0, signal: DACOUT0, pin_signal: PIO0_17/ADC_9/DACOUT_0, mode: pullDown, dacmode: enabled}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 /* clang-format on */
@@ -794,9 +759,9 @@ void DACPins(void)
                       /* Mask bits to zero which are setting */
                       (~(IOCON_PIO_MODE_MASK | IOCON_PIO_DACMODE_MASK)))
 
-                     /* Selects function mode (on-chip pull-up/pull-down resistor control).: Pull-up. Pull-up resistor
-                      * enabled. */
-                     | IOCON_PIO_MODE(PIO0_17_MODE_PULL_UP)
+                     /* Selects function mode (on-chip pull-up/pull-down resistor control).: Pull-down. Pull-down
+                      * resistor enabled. */
+                     | IOCON_PIO_MODE(PIO0_17_MODE_PULL_DOWN)
 
                      /* DAC mode enable.: Enable. */
                      | IOCON_PIO_DACMODE(PIO0_17_DACMODE_ENABLE));

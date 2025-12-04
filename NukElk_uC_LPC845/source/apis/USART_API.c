@@ -317,6 +317,12 @@ uint8_t USART_parse(const char* buff, double* set_value, const uint8_t* const lo
 				}
 				else if (strcmp(para_c, USRT_EN_SIREN) == 0) {
 					ret = 64;
+				}/*
+				else if (strcmp(para_c, USRT_EN_???) == 0) {
+					ret = 65;
+				}*/
+				else if (strcmp(para_c, USRT_EN_MATH) == 0) {
+					ret = 66;
 				}
 				else if (strcmp(para_c, USRT_EN_USART) == 0) {
 					ret = 67;

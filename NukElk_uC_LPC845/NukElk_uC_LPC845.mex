@@ -457,40 +457,6 @@
                   </pin>
                </pins>
             </function>
-            <function name="I2CpPins">
-               <description>Configures pin routing and optionally pin electrical features.</description>
-               <options>
-                  <callFromInitBoot>true</callFromInitBoot>
-                  <prefix></prefix>
-                  <coreID>core0</coreID>
-                  <enableClock>true</enableClock>
-               </options>
-               <dependencies>
-                  <dependency resourceType="Peripheral" resourceId="I2C0" description="Peripheral I2C0 signals are routed in the Pins Tool, but the peripheral is not initialized in the Peripherals Tool." problem_level="1" source="Pins:I2CpPins">
-                     <feature name="initialized" evaluation="equal">
-                        <data>true</data>
-                     </feature>
-                  </dependency>
-                  <dependency resourceType="SWComponent" resourceId="platform.drivers.common" description="Pins initialization requires the COMMON Driver in the project." problem_level="2" source="Pins:I2CpPins">
-                     <feature name="enabled" evaluation="equal" configuration="core0">
-                        <data>true</data>
-                     </feature>
-                  </dependency>
-                  <dependency resourceType="SWComponent" resourceId="platform.drivers.swm" description="Pins initialization requires the SWM Driver in the project." problem_level="2" source="Pins:I2CpPins">
-                     <feature name="enabled" evaluation="equal" configuration="core0">
-                        <data>true</data>
-                     </feature>
-                  </dependency>
-               </dependencies>
-               <pins>
-                  <pin peripheral="I2C0" signal="SCL" pin_num="13" pin_signal="PIO0_10/I2C0_SCL">
-                     <pin_features>
-                        <pin_feature name="direction" value="OUTPUT"/>
-                     </pin_features>
-                  </pin>
-                  <pin peripheral="I2C0" signal="SDA" pin_num="12" pin_signal="PIO0_11/I2C0_SDA"/>
-               </pins>
-            </function>
             <function name="SPEAKPins">
                <description>Configures pin routing and optionally pin electrical features.</description>
                <options>
@@ -563,7 +529,7 @@
                <pins>
                   <pin peripheral="DAC0" signal="DACOUT0" pin_num="48" pin_signal="PIO0_17/ADC_9/DACOUT_0">
                      <pin_features>
-                        <pin_feature name="mode" value="pullUp"/>
+                        <pin_feature name="mode" value="pullDown"/>
                         <pin_feature name="dacmode" value="enabled"/>
                      </pin_features>
                   </pin>
@@ -903,19 +869,6 @@
                   </dependency>
                </dependencies>
                <instances>
-                  <instance name="ACOMP" uuid="adee10aa-ece3-466c-85be-a7f4926344af" type="lpc_acomp" type_id="lpc_acomp_2.1.0" mode="polling" peripheral="ACOMP" enabled="false" comment="" custom_name_enabled="false" editing_lock="false">
-                     <config_set name="fsl_cmp">
-                        <struct name="main_config">
-                           <setting name="enableSyncToBusClk" value="true"/>
-                           <setting name="hysteresisSelection" value="kACOMP_Hysteresis5MVSelection"/>
-                        </struct>
-                        <setting name="positiveChannel" value="ACMP_IN1"/>
-                        <setting name="negativeChannel" value="ACMP_IN2"/>
-                     </config_set>
-                     <config_set name="fsl_dac" quick_selection="dac_default">
-                        <setting name="enableDAC" value="false"/>
-                     </config_set>
-                  </instance>
                   <instance name="CTIMER0" uuid="6027cfad-cb27-4bf8-a163-f9dd06d65f5b" type="ctimer" type_id="ctimer_2.2.2" mode="Capture_Match" peripheral="CTIMER0" enabled="true" comment="" custom_name_enabled="false" editing_lock="false">
                      <config_set name="fsl_ctimer">
                         <struct name="ctimerConfig">
