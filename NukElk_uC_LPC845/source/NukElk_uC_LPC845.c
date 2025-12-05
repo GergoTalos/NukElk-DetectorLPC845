@@ -39,6 +39,7 @@
 # define MAX_MA_CPS 1024
 # define SIREN_CPS 600
 # define SIREN_PERCENT 8;
+# define PAR_MULTIPLIER 1000
 
 /* SysTick INTR */
 # define LOOP_INTERVAL 10U // ms
@@ -95,7 +96,7 @@ volatile uint8_t signal = 0; //read_cps function always gets it. Meth fn. runs m
 // Function declarations
 void read_cps(volatile uint32_t *cps);
 void write_mA(volatile uint32_t *vars);
-void meth(volatile uint32_t *vars);
+void meth_out_value(volatile uint32_t *vars, double out_val);
 uint8_t check_vars(volatile uint32_t *vars, double *value, Vars_name name);
 uint8_t set_vars(volatile uint32_t *vars, double value, Vars_name name);
 void display_texts(char* banner, char* cps_string, char* dac_string);
@@ -114,38 +115,47 @@ void MRT0_IRQHANDLER(void) {
 	MRT_ClearStatusFlags(MRT0_PERIPHERAL, MRT0_CHANNEL_0, kMRT_TimerInterruptFlag);
 	__DSB();//Memory access boundary for the cpu
 }
-
+/**
+ *
+ */
 uint8_t set_vars(volatile uint32_t *vars, double dvalue, Vars_name name) {
 	uint8_t ret = 1;
-	double tmp = ((vars[max_mA_cps]-vars[min_mA_cps])/(1024-vars[min_offset_D]));
+	double tmp = (double)(vars[max_mA_cps]-vars[min_mA_cps])/(1024-vars[min_offset_D]);
 	switch(name) {
 		case cps:
 		case siren_cps:
+		//case min_mA_cps:
+		//case max_mA_cps:
+			vars[name] = (uint32_t)(dvalue);
+			ret = 0;
 		case min_mA_cps:
 		case max_mA_cps:
 			vars[name] = (uint32_t)(dvalue);
+			meth_out_value(vars,vars[cps]);
 			ret = 0;
 			break;
 		case min_offset_V:
 			vars[min_offset_V] = (uint32_t)dvalue;
-			vars[min_offset_D] = (dvalue/100/(VREFP_MA_OUT_V/1024));
+			vars[min_offset_D] = (dvalue/PAR_MULTIPLIER/(VREFP_MA_OUT_V/1024));
+			meth_out_value(vars,vars[cps]);
 			ret = 0;
 			break;
 		case min_offset_D:
 			vars[min_offset_D] = (uint32_t)dvalue;
 			vars[min_offset_V] = floor(dvalue*(VREFP_MA_OUT_V/1024));
+			meth_out_value(vars,vars[cps]);
 			ret = 0;
 			break;
 		case out_value_reg: //calc out_value_V and ..._D
 			vars[out_value_reg] = floor(dvalue);
 			dvalue *= (VREFP_MA_OUT_V/1024);
-			vars[out_value_V] = floor(dvalue*100);
+			vars[out_value_V] = floor(dvalue*PAR_MULTIPLIER);
 			vars[out_value_mA] = ceil(((dvalue-MIN_MA_OUT_V)/(MAX_MA_OUT_V-MIN_MA_OUT_V))*16+4);
 			ret = 0;
 			break;
 		case out_value_V: //calc out_value_reg and ..._mA
 			vars[out_value_V] = (uint32_t)dvalue;
-			dvalue /= 100;
+			dvalue /= PAR_MULTIPLIER;
 			vars[out_value_mA] = ceil(((dvalue-MIN_MA_OUT_V)/(MAX_MA_OUT_V-MIN_MA_OUT_V))*16+4);
 			dvalue /= (VREFP_MA_OUT_V/1024);
 			//double tmp = ((vars[max_mA_cps]-vars[min_mA_cps])/(1024-vars[min_offset_D]));
@@ -155,10 +165,10 @@ uint8_t set_vars(volatile uint32_t *vars, double dvalue, Vars_name name) {
 		case out_value_mA: //calc out_value_reg and ..._V
 			vars[out_value_mA] = (uint32_t)dvalue;
 			dvalue = (((dvalue-4)/16)*(MAX_MA_OUT_V-MIN_MA_OUT_V)+MIN_MA_OUT_V);
-			vars[out_value_V] = floor(dvalue*100);
+			vars[out_value_V] = floor(dvalue*PAR_MULTIPLIER);
 			dvalue /= (VREFP_MA_OUT_V/1024);
 			//double tmp = ((vars[max_mA_cps]-vars[min_mA_cps])/(1024-vars[min_offset_D]));
-			vars[out_value_reg] = floor(dvalue);//floor((dvalue-vars[min_offset_D])*tmp);
+			vars[out_value_reg] = floor((dvalue-vars[min_offset_D])*tmp); // floor(dvalue);
 			ret = 0;
 			break;
 		default:
@@ -192,7 +202,7 @@ uint8_t check_vars(volatile uint32_t *vars, double *dvalue, Vars_name name) {
 		}
 		break;
 	case out_value_V:
-		if (value > -1 && value < 334) {
+		if (value > -1 && value < 3332) {
 			ret = 0;
 		}
 		break;
@@ -202,7 +212,7 @@ uint8_t check_vars(volatile uint32_t *vars, double *dvalue, Vars_name name) {
 		}
 		break;
 	case min_offset_V:
-		if (value > -1 && value < 333) {
+		if (value > -1 && value < 3332) {
 			ret = 0;
 		}
 		break;
@@ -222,9 +232,9 @@ uint8_t check_vars(volatile uint32_t *vars, double *dvalue, Vars_name name) {
 	return ret;
 }
 
-void meth(volatile uint32_t *vars) {
-	double out_val = 0;
-	Semafor_meth: // Read needed value, the rest won't affect it anyway
+void meth_out_value(volatile uint32_t *vars, double out_val) {
+	//double out_val = cps;//0;
+	/*Semafor_meth: // Read needed value, the rest won't affect it anyway
 	if (!signal) {
 		signal = 1;
 		//out_val = (double)vars[cps];
@@ -239,15 +249,18 @@ void meth(volatile uint32_t *vars) {
 	}
 	else {
 		en_reg &= 0xEF; //disable siren
-	}
+	}*/
 	// Corrected cps for  between min and max cps with offset.
 	// CAN BE OVER 1023, but the DAC's max is 1023.
-	double tmp = ((vars[max_mA_cps]-vars[min_mA_cps])/(1024-vars[min_offset_D]));
-	out_val = (out_val/tmp)+vars[min_offset_D];
+	double tmp = (double)(vars[max_mA_cps]-vars[min_mA_cps])/(1024-vars[min_offset_D]);
+	out_val = ((out_val-vars[min_mA_cps])/tmp)+vars[min_offset_D];
+	if (out_val < 0) { // can't be below zero
+		out_val = 0;
+	}
 	vars[out_value_reg] = floor(out_val);
 	// Value in Volts on the pin XX with one decimal.
 	out_val *= (VREFP_MA_OUT_V/1024);
-	vars[out_value_V] = floor(out_val*100);
+	vars[out_value_V] = floor(out_val*PAR_MULTIPLIER);
 	// Value in expected mA
 	vars[out_value_mA] = ceil(((out_val-MIN_MA_OUT_V)/(MAX_MA_OUT_V-MIN_MA_OUT_V))*16+4);
 }
@@ -344,7 +357,7 @@ int main(void) {
 "%5d"
 "\x1b[1B"
 "\x1b[25G"
-"%5.2f"
+"%6.3f"
 "\x1b[1B"
 "\x1b[25G"
 "%5d"
@@ -353,7 +366,7 @@ int main(void) {
 "%5d"
 "\x1b[1B"
 "\x1b[25G"
-"%5.2f"
+"%6.3f"
 "\x1b[1B"
 "\x1b[25G"
 "%5d"
@@ -390,6 +403,7 @@ int main(void) {
 	GetString_TillEndChar(str_in, CR_CHAR, USART_IN_LEN_MAX, 1); // reset USART
 
 	/* Init default values of variables */
+	uint32_t tmp_cps = 0;
 	vars[cps] = 0;
 	vars[min_mA_cps] = MIN_MA_CPS;
 	vars[max_mA_cps] = MAX_MA_CPS;
@@ -397,8 +411,8 @@ int main(void) {
 	vars[out_value_V] = 0;
 	vars[out_value_mA] = 0;
 	// Calculate from the given minimum voltage the offset of the dac's output_value
-	vars[min_offset_V] = MIN_MA_OUT_V; //volts_irl*100
-	vars[min_offset_D] = floor((MIN_MA_OUT_V/(VREFP_MA_OUT_V/1024))*100);
+	vars[min_offset_V] = MIN_MA_OUT_V; //volts_irl*1000
+	vars[min_offset_D] = floor((MIN_MA_OUT_V/(VREFP_MA_OUT_V/1024))*PAR_MULTIPLIER);
 	// Sounds the siren if exceeded
 	vars[siren_cps] = SIREN_CPS;
 
@@ -418,7 +432,23 @@ int main(void) {
 				//}
         	//}
         	if (en_reg & 0x40) { // Calculate Other variables based on cps. Disabling only helps debug.
-        		meth(vars);
+        		Semafor_meth: // Read needed value, the rest won't affect it anyway
+				if (!signal) {
+					signal = 1;
+					//tmp_cps = (double)vars[cps];
+					tmp_cps = vars[cps];
+					signal = 0;
+				}
+				else {
+					goto Semafor_meth;
+				}
+				if (tmp_cps > vars[siren_cps]) {
+					en_reg |= 0x10; //enable siren
+				}
+				else {
+					en_reg &= 0xEF; //disable siren
+				}
+				meth_out_value(vars, (double)tmp_cps); // calculates out_val_reg for DAC
         	}
 			if (en_reg & 0x02) { // DAC
 				POWER_DisablePD(kPDRUNCFG_PD_DAC0); // Ensure DAC is ON
@@ -428,15 +458,16 @@ int main(void) {
 				POWER_EnablePD(kPDRUNCFG_PD_DAC0); // Ensure DAC is OFF
 			}
 			if (en_reg & 0x04) { // OLED
-				OLED_print_int(37,3, vars[cps]); //(signed long)
-				float tmp = vars[out_value_V]/100;
-				OLED_print_float(37,4, tmp,2); //(signed long)
+				OLED_print_int(37,3, vars[cps]);
+				float tmp = (float)vars[out_value_V]/PAR_MULTIPLIER;
+				OLED_print_float(37,4,tmp,4);
 			}
 			else {
 				OLED_clear_screen();
 			}
 			if (en_reg & 0x08) { // 7Seg
-				BCD_pint2(20 < vars[out_value_mA] ? 20 : vars[out_value_mA]); // "20mA" (1023, or 3.3V) is the max on the DAC, therefore 20mA is the max here
+				//BCD_pint2(20 < vars[out_value_mA] ? 20 : vars[out_value_mA]); // "20mA" (1023, or 3.3V) is the max on the DAC, but the operator needs to know, that cps is over the upper limit
+				BCD_pint2(vars[out_value_mA]);
 			}
 			else {
 				BCD_blank();
@@ -583,8 +614,8 @@ int main(void) {
 					usart_disp_txt = 0;
 				}
 				//else {
-				float tmp0 = (float)vars[out_value_V]/100;
-				float tmp1 = (float)vars[min_offset_V]/100;
+				float tmp0 = (float)vars[out_value_V]/PAR_MULTIPLIER;
+				float tmp1 = (float)vars[min_offset_V]/PAR_MULTIPLIER;
 				PrintUSART0_NB("\x1b[60"); // are you there?
 				// Print special message
 				//sprintf(str_out,"\r\n%s\r\n",special);
