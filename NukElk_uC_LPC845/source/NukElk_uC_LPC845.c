@@ -30,7 +30,6 @@
 # define USART_IN_LEN_MAX 32
 # define USART_OUT 512
 # define USART_SPECIAL 50
-# define USART_CHECK_TIME 12U
 
 // Default values
 # define MIN_MA_OUT_V 0
@@ -44,7 +43,7 @@
 /* SysTick INTR */
 # define LOOP_INTERVAL 10U // ms
 # define MEASURE_INTERVAL 1000U // 1s
-# define USART_INTERVAL 30U // ms
+# define USART_INTERVAL 20U // ms
 //# define SIREN_INTERVAL 50U // ms
 # define MSR_INTERVAL_CYCLES 30000000 // 30MHz => 1s
 volatile uint32_t systick_counter = LOOP_INTERVAL;
@@ -117,7 +116,7 @@ void MRT0_IRQHANDLER(void) {
 }
 
 uint8_t set_vars(volatile uint32_t *vars, double dvalue, Vars_name name) {
-	uint8_t ret = 0;
+	uint8_t ret = 1;
 	double tmp = ((vars[max_mA_cps]-vars[min_mA_cps])/(1024-vars[min_offset_D]));
 	switch(name) {
 		case cps:
@@ -125,24 +124,24 @@ uint8_t set_vars(volatile uint32_t *vars, double dvalue, Vars_name name) {
 		case min_mA_cps:
 		case max_mA_cps:
 			vars[name] = (uint32_t)(dvalue);
-			ret = 1;
+			ret = 0;
 			break;
 		case min_offset_V:
 			vars[min_offset_V] = (uint32_t)dvalue;
 			vars[min_offset_D] = (dvalue/100/(VREFP_MA_OUT_V/1024));
-			ret = 1;
+			ret = 0;
 			break;
 		case min_offset_D:
 			vars[min_offset_D] = (uint32_t)dvalue;
 			vars[min_offset_V] = floor(dvalue*(VREFP_MA_OUT_V/1024));
-			ret = 1;
+			ret = 0;
 			break;
 		case out_value_reg: //calc out_value_V and ..._D
 			vars[out_value_reg] = floor(dvalue);
 			dvalue *= (VREFP_MA_OUT_V/1024);
 			vars[out_value_V] = floor(dvalue*100);
 			vars[out_value_mA] = ceil(((dvalue-MIN_MA_OUT_V)/(MAX_MA_OUT_V-MIN_MA_OUT_V))*16+4);
-			ret = 1;
+			ret = 0;
 			break;
 		case out_value_V: //calc out_value_reg and ..._mA
 			vars[out_value_V] = (uint32_t)dvalue;
@@ -151,7 +150,7 @@ uint8_t set_vars(volatile uint32_t *vars, double dvalue, Vars_name name) {
 			dvalue /= (VREFP_MA_OUT_V/1024);
 			//double tmp = ((vars[max_mA_cps]-vars[min_mA_cps])/(1024-vars[min_offset_D]));
 			vars[out_value_reg] = floor((dvalue-vars[min_offset_D])*tmp);
-			ret = 1;
+			ret = 0;
 			break;
 		case out_value_mA: //calc out_value_reg and ..._V
 			vars[out_value_mA] = (uint32_t)dvalue;
@@ -160,7 +159,7 @@ uint8_t set_vars(volatile uint32_t *vars, double dvalue, Vars_name name) {
 			dvalue /= (VREFP_MA_OUT_V/1024);
 			//double tmp = ((vars[max_mA_cps]-vars[min_mA_cps])/(1024-vars[min_offset_D]));
 			vars[out_value_reg] = floor(dvalue);//floor((dvalue-vars[min_offset_D])*tmp);
-			ret = 1;
+			ret = 0;
 			break;
 		default:
 			break;
@@ -169,52 +168,52 @@ uint8_t set_vars(volatile uint32_t *vars, double dvalue, Vars_name name) {
 }
 
 uint8_t check_vars(volatile uint32_t *vars, double *dvalue, Vars_name name) {
-	uint8_t ret = 0;
+	uint8_t ret = 1;
 	int32_t value = *dvalue;
 	switch(name) {
 	case cps:
 		if (value > -1) {
-			ret = 1;
+			ret = 0;
 		}
 		break;
 	case min_mA_cps:
 		if (value > -1 && value < vars[max_mA_cps]) {
-			ret = 1;
+			ret = 0;
 		}
 		break;
 	case max_mA_cps:
 		if (value > -1 && value > vars[min_mA_cps]) {
-			ret = 1;
+			ret = 0;
 		}
 		break;
 	case out_value_reg:
 		if (value > -1 && value < 1024) {
-			ret = 1;
+			ret = 0;
 		}
 		break;
 	case out_value_V:
-		if (value > -1 && value < 333) {
-			ret = 1;
+		if (value > -1 && value < 334) {
+			ret = 0;
 		}
 		break;
 	case out_value_mA:
 		if (value > 3 && value < 21) {
-			ret = 1;
+			ret = 0;
 		}
 		break;
 	case min_offset_V:
 		if (value > -1 && value < 333) {
-			ret = 1;
+			ret = 0;
 		}
 		break;
 	case min_offset_D:
 		if (value > -1 && value < 1024) {
-			ret = 1;
+			ret = 0;
 		}
 		break;
 	case siren_cps:
 		if (value > -1) {
-			ret = 1;
+			ret = 0;
 		}
 		break;
 	default:
@@ -254,7 +253,7 @@ void meth(volatile uint32_t *vars) {
 }
 
 void write_mA(volatile uint32_t *vars) {
-	if (vars[out_value_reg] < vars[max_mA_cps]) {
+	if (vars[out_value_reg] < 1024) { //vars[max_mA_cps]
 		DAC_SetBufferValue(DAC0_PERIPHERAL,vars[out_value_reg]);
 	}
 	else {
@@ -437,7 +436,7 @@ int main(void) {
 				OLED_clear_screen();
 			}
 			if (en_reg & 0x08) { // 7Seg
-				BCD_pint2(vars[out_value_mA]);
+				BCD_pint2(20 < vars[out_value_mA] ? 20 : vars[out_value_mA]); // "20mA" (1023, or 3.3V) is the max on the DAC, therefore 20mA is the max here
 			}
 			else {
 				BCD_blank();
@@ -514,7 +513,7 @@ int main(void) {
 							}
 							else if (code > 29) { //set a parameter
 								code -= 30;
-								if (check_vars(vars, &new_value, code)) { //Checks validity
+								if (!check_vars(vars, &new_value, code)) { //Checks validity
 									set_vars(vars, new_value, code);
 									//vars[code] = (uint32_t)new_value; // sets new value
 									strcpy(special,"\r\n\tParameter has been set!\r\n\r\n");
