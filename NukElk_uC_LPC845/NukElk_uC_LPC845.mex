@@ -872,7 +872,7 @@
                   <instance name="CTIMER0" uuid="6027cfad-cb27-4bf8-a163-f9dd06d65f5b" type="ctimer" type_id="ctimer_2.2.2" mode="Capture_Match" peripheral="CTIMER0" enabled="true" comment="" custom_name_enabled="false" editing_lock="false">
                      <config_set name="fsl_ctimer">
                         <struct name="ctimerConfig">
-                           <setting name="mode" value="kCTIMER_IncreaseOnRiseEdge"/>
+                           <setting name="mode" value="kCTIMER_IncreaseOnFallEdge"/>
                            <setting name="input_clk" value="kCTIMER_Capture_0"/>
                            <setting name="clockSource" value="FunctionClock"/>
                            <setting name="clockSourceFreq" value="custom:30Mhz"/>

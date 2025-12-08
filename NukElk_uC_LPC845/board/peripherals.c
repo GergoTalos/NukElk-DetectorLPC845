@@ -70,7 +70,7 @@ instance:
 - config_sets:
   - fsl_ctimer:
     - ctimerConfig:
-      - mode: 'kCTIMER_IncreaseOnRiseEdge'
+      - mode: 'kCTIMER_IncreaseOnFallEdge'
       - input_clk: 'kCTIMER_Capture_0'
       - clockSource: 'FunctionClock'
       - clockSourceFreq: 'custom:30Mhz'
@@ -87,7 +87,7 @@ instance:
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
 /* clang-format on */
 const ctimer_config_t CTIMER0_config = {
-  .mode = kCTIMER_IncreaseOnRiseEdge,
+  .mode = kCTIMER_IncreaseOnFallEdge,
   .input = kCTIMER_Capture_0,
   .prescale = 0
 };

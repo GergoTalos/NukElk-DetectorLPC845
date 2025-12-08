@@ -67,7 +67,8 @@ void SysTick_Handler(void) {
 	}*/
 }
 
-/* Enable Register
+/**
+ * Enable Register
  * Enables functions of the device
  * 0x01: cps reading
  * 0x02: 4-20 mA output
@@ -80,7 +81,7 @@ void SysTick_Handler(void) {
  */
 volatile uint8_t en_reg = 0b01011110;
 
-/* Init variable names and list in memory */
+/* Init parameter names and list in memory */
 typedef enum Vars_name {
 	cps = 0, min_mA_cps = 1, max_mA_cps = 2, out_value_reg = 3, out_value_V = 4, out_value_mA = 5, min_offset_V = 6, min_offset_D = 7, siren_cps = 8
 } Vars_name;
@@ -116,7 +117,11 @@ void MRT0_IRQHANDLER(void) {
 	__DSB();//Memory access boundary for the cpu
 }
 /**
- *
+ * Sets the "name" parameter to "dvalue" in the "vars" list.
+ * @parameter vars, volatile uint32_t*; the parameter list
+ * @parameter dvalue, double; the new value of the parameter
+ * @parameter name, Vars_name; the index of the modified parameter
+ * @return 1, if an error is present, otherwise 0
  */
 uint8_t set_vars(volatile uint32_t *vars, double dvalue, Vars_name name) {
 	uint8_t ret = 1;
@@ -177,9 +182,16 @@ uint8_t set_vars(volatile uint32_t *vars, double dvalue, Vars_name name) {
 	return ret;
 }
 
+/**
+ * Checks the validity of the new value
+ * @parameter vars, volatile uint32_t*; the parameter list
+ * @parameter dvalue, double*; the new value of the parameter
+ * @parameter name, Vars_name; the index of the checked parameter
+ * @return 1, if an error is present, otherwise 0
+ */
 uint8_t check_vars(volatile uint32_t *vars, double *dvalue, Vars_name name) {
 	uint8_t ret = 1;
-	int32_t value = *dvalue;
+	int32_t value = *dvalue; //recast to signed long
 	switch(name) {
 	case cps:
 		if (value > -1) {
@@ -232,6 +244,11 @@ uint8_t check_vars(volatile uint32_t *vars, double *dvalue, Vars_name name) {
 	return ret;
 }
 
+/**
+ * Calculates the out_value_reg, _V and _mA parameters from "out_value"
+ * @parameter vars, volatile uint32_t*; the parameter list
+ * @parameter out_value, double; the cps value to calculate from
+ */
 void meth_out_value(volatile uint32_t *vars, double out_val) {
 	//double out_val = cps;//0;
 	/*Semafor_meth: // Read needed value, the rest won't affect it anyway
@@ -250,7 +267,7 @@ void meth_out_value(volatile uint32_t *vars, double out_val) {
 	else {
 		en_reg &= 0xEF; //disable siren
 	}*/
-	// Corrected cps for  between min and max cps with offset.
+	// Corrected cps; between min and max cps with offset.
 	// CAN BE OVER 1023, but the DAC's max is 1023.
 	double tmp = (double)(vars[max_mA_cps]-vars[min_mA_cps])/(1024-vars[min_offset_D]);
 	out_val = ((out_val-vars[min_mA_cps])/tmp)+vars[min_offset_D];
@@ -258,15 +275,19 @@ void meth_out_value(volatile uint32_t *vars, double out_val) {
 		out_val = 0;
 	}
 	vars[out_value_reg] = floor(out_val);
-	// Value in Volts on the pin XX with one decimal.
+	// Value in Volts on pin 2 with PAR_MULRIPLIER decimal.
 	out_val *= (VREFP_MA_OUT_V/1024);
 	vars[out_value_V] = floor(out_val*PAR_MULTIPLIER);
 	// Value in expected mA
 	vars[out_value_mA] = ceil(((out_val-MIN_MA_OUT_V)/(MAX_MA_OUT_V-MIN_MA_OUT_V))*16+4);
 }
 
+/**
+ * Writes the out_value_reg parameter to the DAC's register
+ * @parameter vars, volatile uint32_t; the parameter list
+ */
 void write_mA(volatile uint32_t *vars) {
-	if (vars[out_value_reg] < 1024) { //vars[max_mA_cps]
+	if (vars[out_value_reg] < 1024) {
 		DAC_SetBufferValue(DAC0_PERIPHERAL,vars[out_value_reg]);
 	}
 	else {
@@ -275,7 +296,8 @@ void write_mA(volatile uint32_t *vars) {
 }
 
 /**
- * Reads the number of counts counted by the timer on pin XX.
+ * Reads the number of counts counted by the timer on pin 39.
+ * @parameter cps, volatile uint32_t*; storage for the read value
  */
 void read_cps(volatile uint32_t *cps) {
 	signal = 1;
@@ -283,6 +305,12 @@ void read_cps(volatile uint32_t *cps) {
 	signal = 0;
 }
 
+/**
+ * Writes the constant texts to the oled panel
+ * @parameter banner, char*; the first text
+ * @parameter cps_string, char*; the second text
+ * @parameter dac_string, char*; the third text
+ */
 void display_texts(char* banner, char* cps_string, char* dac_string) {
     OLED_print_string(7,0, banner);
     OLED_print_string(7,3, cps_string);
@@ -290,7 +318,7 @@ void display_texts(char* banner, char* cps_string, char* dac_string) {
 }
 
 /**
- * @brief   Application entry point.
+ * @brief The application entry point.
  */
 int main(void) {
     /* Init board hardware. */
@@ -302,7 +330,7 @@ int main(void) {
     BOARD_InitDebugConsole();
 #endif
     if (SYSTICK) {
-		while (1) { //  If function failed infinite Error message on USART
+		while (1) { //  If the function failed generate infinite Error message on USART
 		   PRINTF("ERROR: SysTick Init\r\n");
 		}
     }
@@ -311,17 +339,18 @@ int main(void) {
     BCD_init();
     BCD_pint2(0);
 
-    /* Init Oled display */
+    /* Init Oled display and its texts */
     char banner[22] = "Nuclear Electronics";
     char cps_string[5] = "CPS:";
     char dac_string[7] = "DAC V:";
     OLED_init();
     display_texts(banner,cps_string,dac_string);
 
-    /* Init USART */
+    /* Init USART and USART texts */
 	char str_in[USART_IN_LEN_MAX];
 	char special[USART_SPECIAL];
 	char str_out[USART_OUT];
+	// USART texts
 	char usart_text[270] = "\r\nParams:\x1b[19GValue:\r\n"
 "\tCPS:\r\n"
 "\tmin_mA_CPS:\r\n"
@@ -341,11 +370,13 @@ int main(void) {
 "\tNIX:\r\n"
 "\tmath:\r\n"
 "\tUSART:\r\n";
-	char usart_values [250] = "\x1b[ ? 25 l"
-"\x1b[s"
-"\x1b[18A"
-"\x1b[25G"
-"%5d"
+
+	// USART magic:
+	char usart_values [250] = "\x1b[ ? 25 l" //make cursor invisible. (doesn't work everywhere)..
+"\x1b[s"	//save cursor position
+"\x1b[18A"	//18up
+"\x1b[25G"	//25right
+"%5d"		//format
 "\x1b[1B"
 "\x1b[25G"
 "%5d"
@@ -396,13 +427,13 @@ int main(void) {
 "\x1b[29G"
 "%1hd"
 
-"\x1b[u"
-"\x1b[ ? 25 h";
-	uint8_t usart_disp_txt = 0;
+"\x1b[u" // restore saved cursor position
+"\x1b[ ? 25 h"; // show cursor
+	uint8_t usart_disp_txt = 0; // write constant text on to the screen
 	INIT_USART();
 	GetString_TillEndChar(str_in, CR_CHAR, USART_IN_LEN_MAX, 1); // reset USART
 
-	/* Init default values of variables */
+	/* Init default values of parameters */
 	uint32_t tmp_cps = 0;
 	vars[cps] = 0;
 	vars[min_mA_cps] = MIN_MA_CPS;
@@ -425,13 +456,13 @@ int main(void) {
         	systick_counter = LOOP_INTERVAL; //Reset Loop interval
 
         	/* Perform enabled functions */
-        	//if (measure_counter == 0U) {
-				//measure_counter = MSR_INTERVAL;
-				//if (en_reg & 0x01) {
-				//	read_cps(Vars+cps);
-				//}
-        	//}
-        	if (en_reg & 0x40) { // Calculate Other variables based on cps. Disabling only helps debug.
+        	/*if (measure_counter == 0U) {
+				measure_counter = MSR_INTERVAL;
+				if (en_reg & 0x01) {
+					read_cps(Vars+cps);
+				}
+        	}*/
+        	if (en_reg & 0x40) { // math: Calculate Other parameters based on cps.
         		Semafor_meth: // Read needed value, the rest won't affect it anyway
 				if (!signal) {
 					signal = 1;
@@ -452,7 +483,7 @@ int main(void) {
         	}
 			if (en_reg & 0x02) { // DAC
 				POWER_DisablePD(kPDRUNCFG_PD_DAC0); // Ensure DAC is ON
-				write_mA(vars); // Needs other variables too
+				write_mA(vars);
 			}
 			else {
 				POWER_EnablePD(kPDRUNCFG_PD_DAC0); // Ensure DAC is OFF
@@ -520,7 +551,6 @@ int main(void) {
 						break;
 						case 93:
 						{
-							strcpy(special,"\r\n\tNo such variable!\r\n\r\n");
 						}
 						break;
 						case 96:
