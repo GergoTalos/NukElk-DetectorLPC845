@@ -37,7 +37,7 @@
 # define VREFP_MA_OUT_V (float)3.3
 # define MIN_MA_CPS 0
 # define MAX_MA_CPS 1024
-# define SIREN_CPS 600
+# define SIREN_CPS 60
 # define SIREN_PERCENT 8;
 # define PAR_MULTIPLIER 1000
 
@@ -202,7 +202,7 @@ uint8_t check_vars(volatile uint32_t *vars, double *dvalue, Vars_name name) {
 		}
 		break;
 	case out_value_V:
-		if (value > -1 && value < 3332) {
+		if (value > -1 && value < 3300) {
 			ret = 0;
 		}
 		break;
@@ -212,7 +212,7 @@ uint8_t check_vars(volatile uint32_t *vars, double *dvalue, Vars_name name) {
 		}
 		break;
 	case min_offset_V:
-		if (value > -1 && value < 3332) {
+		if (value > -1 && value < 3300) {
 			ret = 0;
 		}
 		break;
