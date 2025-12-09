@@ -1,0 +1,88 @@
+/**
+ * USART.h
+ *
+ *  Created on: Apr 15, 2023
+ *      Author: benes, talos: USART_parse, arith, Backtracking and echo in GetString_TillEndChar
+ * Defines USART API
+ */
+
+#ifndef USART_API_H
+#define USART_API_H
+
+#include "stdint.h"
+
+/* CharCode defines */
+#define ESC 0x1b
+#define CR_CHAR	0x0d
+#define LF  0x0a
+#define BS  0x08
+#define DEL 0x7F
+
+/* Command defines */
+# define COMMAND_LEN 11
+# define PARAM_LEN 13
+
+# define USRT_NIX ""
+# define USRT_LOGIN "login"
+# define USRT_LOGOUT "logout"
+
+# define USRT_MODIFY "modify"
+# define USRT_MODIFY_CPS "cps"
+# define USRT_MODIFY_MIN_CPS "min_ma_cps"
+# define USRT_MODIFY_MAX_CPS "max_ma_cps"
+# define USRT_MODIFY_OUT_V_REG "out_val_r"
+# define USRT_MODIFY_OUT_V_V "out_val_v"
+# define USRT_MODIFY_OUT_V_MA "out_val_ma"
+# define USRT_MODIFY_MA_OFFS_V "min_offset_v"
+# define USRT_MODIFY_MA_OFFS_D "min_offset_v"
+# define USRT_MODIFY_SIREN_CPS "siren_cps"
+
+# define USRT_EN "enable"
+# define USRT_EN_CPS "cps_in"
+# define USRT_EN_MA "mA_out"
+# define USRT_EN_DISP "oled"
+# define USRT_EN_SEG "7segment"
+# define USRT_EN_SIREN "siren"
+# define USRT_EN_USART "USART"
+
+
+void INIT_USART(void);
+void PrintUSART0_NB(char * str);
+uint8_t GetUSART0(uint8_t *data);
+
+/**
+ * Gets chars from usart0 into a string until the end character.
+ * Uses states, needs to be reset at startup and after and end character is reached.
+ * I only modified it, so it can backtrack and echo, since hardware echo is dodgey.
+ * @param str char*, the result string
+ * @param End_Char uint8_t, the ecd char
+ * @param LenMax uint8_t, the length of the result buffer
+ * @param reset uint8_t, to reset the state-machine
+ * @return uint8_t if an error occurred
+ */
+uint8_t GetString_TillEndChar(char *str, uint8_t End_Char, uint8_t LenMax, uint8_t reset);
+
+/**
+ * Parses a number from a string.
+ * @param buffer char*, the buffer/string
+ * @param i int8_t, the offset of parsing
+ * @return double, the parsed number
+ */
+double arith(const char *buffer, int8_t i);
+
+/**
+ * USART command parser
+ * @param buff char*, the input buffer
+ * @param set_value double*, the future value, that needs to be set to a parameter
+ * @param logd_in uint8_t*, for authorization
+ * @return uint8_t, the result of the parsing:
+ *      + 0 Not loged in
+ *      + 1 login
+ *      + 2 logout
+ *      + 30-39 set parameters
+ *      + 254 ENTER, empty
+ *      + >90, error
+ */
+uint8_t USART_parse(const char* buff, double* set_value, const uint8_t* const logd_in);
+
+#endif /* USART_API_H */

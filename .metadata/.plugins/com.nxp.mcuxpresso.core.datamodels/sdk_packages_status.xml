@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sdk-packages>
+<package hash="1751041170000" path="D:\MCUXpressoIDE_25.6.136\ide\plugins\com.nxp.mcuxpresso.core.datamodels.resources_25.6.0.202501151204\override" schema="manifest-schema/sdk_manifest_v3.3.xsd"/>
+<package hash="1751041170000" path="D:\MCUXpressoIDE_25.6.136\ide\plugins\com.nxp.mcuxpresso.core.datamodels.resources_25.6.0.202501151204\fragments" schema="manifest-schema/sdk_manifest_v3.3.xsd"/>
+<package hash="1763390613129" path="C:\Users\talos\mcuxpresso\02\SDKPackages\com.nxp.mcuxpresso.sdk.sdk_2.x_lpc845breakout_p2site_24.12.0.20191125144613084534836516599714.zip" schema="manifest-schema/sdk_manifest_v3.15.xsd"/>
+</sdk-packages>

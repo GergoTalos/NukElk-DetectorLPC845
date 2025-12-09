@@ -1,0 +1,174 @@
+15:30:44 **** Incremental Build of configuration Debug for project NukElk_uC_LPC845 ****
+make -r -j4 all 
+Building file: ../source/NukElk_uC_LPC845.c
+Invoking: MCU C Compiler
+arm-none-eabi-gcc -D__REDLIB__ -DCPU_LPC845M301JBD48 -DCPU_LPC845M301JBD48_cm0plus -DSDK_DEBUGCONSOLE=1 -DPRINTF_FLOAT_ENABLE=1 -D__MCUXPRESSO -D__USE_CMSIS -DDEBUG -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\component\uart" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\drivers" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\CMSIS" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\CMSIS\m-profile" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\device" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\utilities\debug_console_lite" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\utilities\str" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\utilities" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\device\periph2" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\board" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\source" -O0 -fno-common -g3 -gdwarf-4 -Wall -c -ffunction-sections -fdata-sections -fno-builtin -fmerge-constants -fmacro-prefix-map="../source/"= -mcpu=cortex-m0plus -mthumb -D__REDLIB__ -fstack-usage -specs=redlib.specs -MMD -MP -MF"source/NukElk_uC_LPC845.d" -MT"source/NukElk_uC_LPC845.o" -MT"source/NukElk_uC_LPC845.d" -o "source/NukElk_uC_LPC845.o" "../source/NukElk_uC_LPC845.c"
+../source/NukElk_uC_LPC845.c: In function 'main':
+../source/NukElk_uC_LPC845.c:493:88: warning: passing argument 3 of 'USART_parse' discards 'volatile' qualifier from pointer target type [-Wdiscarded-qualifiers]
+  493 |                                         uint8_t code = USART_parse(str_in, &new_value, &en_reg); //Parse valid USART commands.
+      |                                                                                        ^~~~~~~
+In file included from ../source/NukElk_uC_LPC845.c:26:
+../source/apis/USART_API.h:87:79: note: expected 'const uint8_t * const' {aka 'const unsigned char * const'} but argument is of type 'volatile uint8_t *' {aka 'volatile unsigned char *'}
+   87 | uint8_t USART_parse(const char* buff, double* set_value, const uint8_t* const logd_in);
+      |                                                          ~~~~~~~~~~~~~~~~~~~~~^~~~~~~
+Finished building: ../source/NukElk_uC_LPC845.c
+ 
+Building target: NukElk_uC_LPC845.axf
+Invoking: MCU Linker
+arm-none-eabi-gcc -nostdlib -Xlinker -Map="NukElk_uC_LPC845.map" -Xlinker --gc-sections -Xlinker -print-memory-usage -Xlinker --sort-section=alignment -Xlinker --cref -mcpu=cortex-m0plus -mthumb -T NukElk_uC_LPC845_Debug.ld -o "NukElk_uC_LPC845.axf" ./utilities/str/fsl_str.o  ./utilities/debug_console_lite/fsl_debug_console.o  ./utilities/fsl_assert.o  ./startup/startup_lpc845.o  ./source/ic_drivers/SSD1309.o ./source/ic_drivers/fonts.o  ./source/apis/BCD_API.o ./source/apis/SPI_API.o ./source/apis/USART_API.o  ./source/NukElk_uC_LPC845.o ./source/datatypes.o ./source/mtb.o ./source/semihost_hardfault.o  ./drivers/fsl_acomp.o ./drivers/fsl_adc.o ./drivers/fsl_clock.o ./drivers/fsl_common.o ./drivers/fsl_common_arm.o ./drivers/fsl_ctimer.o ./drivers/fsl_dac.o ./drivers/fsl_gpio.o ./drivers/fsl_i2c.o ./drivers/fsl_mrt.o ./drivers/fsl_power.o ./drivers/fsl_reset.o ./drivers/fsl_sctimer.o ./drivers/fsl_spi.o ./drivers/fsl_swm.o ./drivers/fsl_usart.o  ./device/system_LPC845.o  ./component/uart/fsl_adapter_miniusart.o  ./board/board.o ./board/clock_config.o ./board/peripherals.o ./board/pin_mux.o   
+Memory region         Used Size  Region Size  %age Used
+   PROGRAM_FLASH:       49492 B        64 KB     75.52%
+            SRAM:        1712 B      16352 B     10.47%
+        IAP_SRAM:           0 B         32 B      0.00%
+Finished building target: NukElk_uC_LPC845.axf
+ 
+Performing post-build steps
+arm-none-eabi-size "NukElk_uC_LPC845.axf"; # arm-none-eabi-objcopy -v -O binary "NukElk_uC_LPC845.axf" "NukElk_uC_LPC845.bin" ; # checksum -p LPC845 -d "NukElk_uC_LPC845.bin";
+   text	   data	    bss	    dec	    hex	filename
+  49468	     24	   1688	  51180	   c7ec	NukElk_uC_LPC845.axf
+ 
+15:33:50 **** Incremental Build of configuration Debug for project NukElk_uC_LPC845 ****
+make -r -j4 all 
+make[1]: Nothing to be done for 'main-build'.
+Performing post-build steps
+arm-none-eabi-size "NukElk_uC_LPC845.axf"; # arm-none-eabi-objcopy -v -O binary "NukElk_uC_LPC845.axf" "NukElk_uC_LPC845.bin" ; # checksum -p LPC845 -d "NukElk_uC_LPC845.bin";
+   text	   data	    bss	    dec	    hex	filename
+  49468	     24	   1688	  51180	   c7ec	NukElk_uC_LPC845.axf
+ 
+15:39:58 **** Incremental Build of configuration Debug for project NukElk_uC_LPC845 ****
+make -r -j4 all 
+Building file: ../source/NukElk_uC_LPC845.c
+Invoking: MCU C Compiler
+arm-none-eabi-gcc -D__REDLIB__ -DCPU_LPC845M301JBD48 -DCPU_LPC845M301JBD48_cm0plus -DSDK_DEBUGCONSOLE=1 -DPRINTF_FLOAT_ENABLE=1 -D__MCUXPRESSO -D__USE_CMSIS -DDEBUG -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\component\uart" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\drivers" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\CMSIS" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\CMSIS\m-profile" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\device" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\utilities\debug_console_lite" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\utilities\str" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\utilities" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\device\periph2" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\board" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\source" -O0 -fno-common -g3 -gdwarf-4 -Wall -c -ffunction-sections -fdata-sections -fno-builtin -fmerge-constants -fmacro-prefix-map="../source/"= -mcpu=cortex-m0plus -mthumb -D__REDLIB__ -fstack-usage -specs=redlib.specs -MMD -MP -MF"source/NukElk_uC_LPC845.d" -MT"source/NukElk_uC_LPC845.o" -MT"source/NukElk_uC_LPC845.d" -o "source/NukElk_uC_LPC845.o" "../source/NukElk_uC_LPC845.c"
+../source/NukElk_uC_LPC845.c: In function 'main':
+../source/NukElk_uC_LPC845.c:494:88: warning: passing argument 3 of 'USART_parse' discards 'volatile' qualifier from pointer target type [-Wdiscarded-qualifiers]
+  494 |                                         uint8_t code = USART_parse(str_in, &new_value, &en_reg); //Parse valid USART commands.
+      |                                                                                        ^~~~~~~
+In file included from ../source/NukElk_uC_LPC845.c:26:
+../source/apis/USART_API.h:87:79: note: expected 'const uint8_t * const' {aka 'const unsigned char * const'} but argument is of type 'volatile uint8_t *' {aka 'volatile unsigned char *'}
+   87 | uint8_t USART_parse(const char* buff, double* set_value, const uint8_t* const logd_in);
+      |                                                          ~~~~~~~~~~~~~~~~~~~~~^~~~~~~
+Finished building: ../source/NukElk_uC_LPC845.c
+ 
+Building target: NukElk_uC_LPC845.axf
+Invoking: MCU Linker
+arm-none-eabi-gcc -nostdlib -Xlinker -Map="NukElk_uC_LPC845.map" -Xlinker --gc-sections -Xlinker -print-memory-usage -Xlinker --sort-section=alignment -Xlinker --cref -mcpu=cortex-m0plus -mthumb -T NukElk_uC_LPC845_Debug.ld -o "NukElk_uC_LPC845.axf" ./utilities/str/fsl_str.o  ./utilities/debug_console_lite/fsl_debug_console.o  ./utilities/fsl_assert.o  ./startup/startup_lpc845.o  ./source/ic_drivers/SSD1309.o ./source/ic_drivers/fonts.o  ./source/apis/BCD_API.o ./source/apis/SPI_API.o ./source/apis/USART_API.o  ./source/NukElk_uC_LPC845.o ./source/datatypes.o ./source/mtb.o ./source/semihost_hardfault.o  ./drivers/fsl_acomp.o ./drivers/fsl_adc.o ./drivers/fsl_clock.o ./drivers/fsl_common.o ./drivers/fsl_common_arm.o ./drivers/fsl_ctimer.o ./drivers/fsl_dac.o ./drivers/fsl_gpio.o ./drivers/fsl_i2c.o ./drivers/fsl_mrt.o ./drivers/fsl_power.o ./drivers/fsl_reset.o ./drivers/fsl_sctimer.o ./drivers/fsl_spi.o ./drivers/fsl_swm.o ./drivers/fsl_usart.o  ./device/system_LPC845.o  ./component/uart/fsl_adapter_miniusart.o  ./board/board.o ./board/clock_config.o ./board/peripherals.o ./board/pin_mux.o   
+Memory region         Used Size  Region Size  %age Used
+   PROGRAM_FLASH:       49372 B        64 KB     75.34%
+            SRAM:        1712 B      16352 B     10.47%
+        IAP_SRAM:           0 B         32 B      0.00%
+Finished building target: NukElk_uC_LPC845.axf
+ 
+Performing post-build steps
+arm-none-eabi-size "NukElk_uC_LPC845.axf"; # arm-none-eabi-objcopy -v -O binary "NukElk_uC_LPC845.axf" "NukElk_uC_LPC845.bin" ; # checksum -p LPC845 -d "NukElk_uC_LPC845.bin";
+   text	   data	    bss	    dec	    hex	filename
+  49348	     24	   1688	  51060	   c774	NukElk_uC_LPC845.axf
+ 
+13:13:49 **** Build of configuration Debug for project NukElk_uC_LPC845 ****
+make -r -j4 all 
+Building file: ../source/NukElk_uC_LPC845.c
+Building file: ../board/peripherals.c
+Invoking: MCU C Compiler
+arm-none-eabi-gcc -D__REDLIB__ -DCPU_LPC845M301JBD48 -DCPU_LPC845M301JBD48_cm0plus -DSDK_DEBUGCONSOLE=1 -DPRINTF_FLOAT_ENABLE=1 -D__MCUXPRESSO -D__USE_CMSIS -DDEBUG -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\component\uart" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\drivers" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\CMSIS" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\CMSIS\m-profile" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\device" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\utilities\debug_console_lite" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\utilities\str" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\utilities" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\device\periph2" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\board" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\source" -O0 -fno-common -g3 -gdwarf-4 -Wall -c -ffunction-sections -fdata-sections -fno-builtin -fmerge-constants -fmacro-prefix-map="../source/"= -mcpu=cortex-m0plus -mthumb -D__REDLIB__ -fstack-usage -specs=redlib.specs -MMD -MP -MF"source/NukElk_uC_LPC845.d" -MT"source/NukElk_uC_LPC845.o" -MT"source/NukElk_uC_LPC845.d" -o "source/NukElk_uC_LPC845.o" "../source/NukElk_uC_LPC845.c"
+Invoking: MCU C Compiler
+arm-none-eabi-gcc -D__REDLIB__ -DCPU_LPC845M301JBD48 -DCPU_LPC845M301JBD48_cm0plus -DSDK_DEBUGCONSOLE=1 -DPRINTF_FLOAT_ENABLE=1 -D__MCUXPRESSO -D__USE_CMSIS -DDEBUG -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\component\uart" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\drivers" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\CMSIS" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\CMSIS\m-profile" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\device" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\utilities\debug_console_lite" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\utilities\str" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\utilities" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\device\periph2" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\board" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\source" -O0 -fno-common -g3 -gdwarf-4 -Wall -c -ffunction-sections -fdata-sections -fno-builtin -fmerge-constants -fmacro-prefix-map="../board/"= -mcpu=cortex-m0plus -mthumb -D__REDLIB__ -fstack-usage -specs=redlib.specs -MMD -MP -MF"board/peripherals.d" -MT"board/peripherals.o" -MT"board/peripherals.d" -o "board/peripherals.o" "../board/peripherals.c"
+../source/NukElk_uC_LPC845.c: In function 'main':
+../source/NukElk_uC_LPC845.c:525:88: warning: passing argument 3 of 'USART_parse' discards 'volatile' qualifier from pointer target type [-Wdiscarded-qualifiers]
+  525 |                                         uint8_t code = USART_parse(str_in, &new_value, &en_reg); //Parse valid USART commands.
+      |                                                                                        ^~~~~~~
+In file included from ../source/NukElk_uC_LPC845.c:26:
+../source/apis/USART_API.h:87:79: note: expected 'const uint8_t * const' {aka 'const unsigned char * const'} but argument is of type 'volatile uint8_t *' {aka 'volatile unsigned char *'}
+   87 | uint8_t USART_parse(const char* buff, double* set_value, const uint8_t* const logd_in);
+      |                                                          ~~~~~~~~~~~~~~~~~~~~~^~~~~~~
+Finished building: ../board/peripherals.c
+ 
+Finished building: ../source/NukElk_uC_LPC845.c
+ 
+Building target: NukElk_uC_LPC845.axf
+Invoking: MCU Linker
+arm-none-eabi-gcc -nostdlib -Xlinker -Map="NukElk_uC_LPC845.map" -Xlinker --gc-sections -Xlinker -print-memory-usage -Xlinker --sort-section=alignment -Xlinker --cref -mcpu=cortex-m0plus -mthumb -T NukElk_uC_LPC845_Debug.ld -o "NukElk_uC_LPC845.axf" ./utilities/str/fsl_str.o  ./utilities/debug_console_lite/fsl_debug_console.o  ./utilities/fsl_assert.o  ./startup/startup_lpc845.o  ./source/ic_drivers/SSD1309.o ./source/ic_drivers/fonts.o  ./source/apis/BCD_API.o ./source/apis/SPI_API.o ./source/apis/USART_API.o  ./source/NukElk_uC_LPC845.o ./source/datatypes.o ./source/mtb.o ./source/semihost_hardfault.o  ./drivers/fsl_acomp.o ./drivers/fsl_adc.o ./drivers/fsl_clock.o ./drivers/fsl_common.o ./drivers/fsl_common_arm.o ./drivers/fsl_ctimer.o ./drivers/fsl_dac.o ./drivers/fsl_gpio.o ./drivers/fsl_i2c.o ./drivers/fsl_mrt.o ./drivers/fsl_power.o ./drivers/fsl_reset.o ./drivers/fsl_sctimer.o ./drivers/fsl_spi.o ./drivers/fsl_swm.o ./drivers/fsl_usart.o  ./device/system_LPC845.o  ./component/uart/fsl_adapter_miniusart.o  ./board/board.o ./board/clock_config.o ./board/peripherals.o ./board/pin_mux.o   
+Memory region         Used Size  Region Size  %age Used
+   PROGRAM_FLASH:       49328 B        64 KB     75.27%
+            SRAM:        1712 B      16352 B     10.47%
+        IAP_SRAM:           0 B         32 B      0.00%
+Finished building target: NukElk_uC_LPC845.axf
+ 
+Performing post-build steps
+arm-none-eabi-size "NukElk_uC_LPC845.axf"; # arm-none-eabi-objcopy -v -O binary "NukElk_uC_LPC845.axf" "NukElk_uC_LPC845.bin" ; # checksum -p LPC845 -d "NukElk_uC_LPC845.bin";
+   text	   data	    bss	    dec	    hex	filename
+  49304	     24	   1688	  51016	   c748	NukElk_uC_LPC845.axf
+ 
+13:19:08 **** Incremental Build of configuration Debug for project NukElk_uC_LPC845 ****
+make -r -j4 all 
+make[1]: Nothing to be done for 'main-build'.
+Performing post-build steps
+arm-none-eabi-size "NukElk_uC_LPC845.axf"; # arm-none-eabi-objcopy -v -O binary "NukElk_uC_LPC845.axf" "NukElk_uC_LPC845.bin" ; # checksum -p LPC845 -d "NukElk_uC_LPC845.bin";
+   text	   data	    bss	    dec	    hex	filename
+  49304	     24	   1688	  51016	   c748	NukElk_uC_LPC845.axf
+ 
+13:24:23 **** Incremental Build of configuration Debug for project NukElk_uC_LPC845 ****
+make -r -j4 all 
+make[1]: Nothing to be done for 'main-build'.
+Performing post-build steps
+arm-none-eabi-size "NukElk_uC_LPC845.axf"; # arm-none-eabi-objcopy -v -O binary "NukElk_uC_LPC845.axf" "NukElk_uC_LPC845.bin" ; # checksum -p LPC845 -d "NukElk_uC_LPC845.bin";
+   text	   data	    bss	    dec	    hex	filename
+  49304	     24	   1688	  51016	   c748	NukElk_uC_LPC845.axf
+ 
+13:28:57 **** Incremental Build of configuration Debug for project NukElk_uC_LPC845 ****
+make -r -j4 all 
+Building file: ../source/NukElk_uC_LPC845.c
+Invoking: MCU C Compiler
+arm-none-eabi-gcc -D__REDLIB__ -DCPU_LPC845M301JBD48 -DCPU_LPC845M301JBD48_cm0plus -DSDK_DEBUGCONSOLE=1 -DPRINTF_FLOAT_ENABLE=1 -D__MCUXPRESSO -D__USE_CMSIS -DDEBUG -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\component\uart" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\drivers" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\CMSIS" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\CMSIS\m-profile" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\device" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\utilities\debug_console_lite" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\utilities\str" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\utilities" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\device\periph2" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\board" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\source" -O0 -fno-common -g3 -gdwarf-4 -Wall -c -ffunction-sections -fdata-sections -fno-builtin -fmerge-constants -fmacro-prefix-map="../source/"= -mcpu=cortex-m0plus -mthumb -D__REDLIB__ -fstack-usage -specs=redlib.specs -MMD -MP -MF"source/NukElk_uC_LPC845.d" -MT"source/NukElk_uC_LPC845.o" -MT"source/NukElk_uC_LPC845.d" -o "source/NukElk_uC_LPC845.o" "../source/NukElk_uC_LPC845.c"
+../source/NukElk_uC_LPC845.c: In function 'main':
+../source/NukElk_uC_LPC845.c:525:88: warning: passing argument 3 of 'USART_parse' discards 'volatile' qualifier from pointer target type [-Wdiscarded-qualifiers]
+  525 |                                         uint8_t code = USART_parse(str_in, &new_value, &en_reg); //Parse valid USART commands.
+      |                                                                                        ^~~~~~~
+In file included from ../source/NukElk_uC_LPC845.c:26:
+../source/apis/USART_API.h:87:79: note: expected 'const uint8_t * const' {aka 'const unsigned char * const'} but argument is of type 'volatile uint8_t *' {aka 'volatile unsigned char *'}
+   87 | uint8_t USART_parse(const char* buff, double* set_value, const uint8_t* const logd_in);
+      |                                                          ~~~~~~~~~~~~~~~~~~~~~^~~~~~~
+Finished building: ../source/NukElk_uC_LPC845.c
+ 
+Building target: NukElk_uC_LPC845.axf
+Invoking: MCU Linker
+arm-none-eabi-gcc -nostdlib -Xlinker -Map="NukElk_uC_LPC845.map" -Xlinker --gc-sections -Xlinker -print-memory-usage -Xlinker --sort-section=alignment -Xlinker --cref -mcpu=cortex-m0plus -mthumb -T NukElk_uC_LPC845_Debug.ld -o "NukElk_uC_LPC845.axf" ./utilities/str/fsl_str.o  ./utilities/debug_console_lite/fsl_debug_console.o  ./utilities/fsl_assert.o  ./startup/startup_lpc845.o  ./source/ic_drivers/SSD1309.o ./source/ic_drivers/fonts.o  ./source/apis/BCD_API.o ./source/apis/SPI_API.o ./source/apis/USART_API.o  ./source/NukElk_uC_LPC845.o ./source/datatypes.o ./source/mtb.o ./source/semihost_hardfault.o  ./drivers/fsl_acomp.o ./drivers/fsl_adc.o ./drivers/fsl_clock.o ./drivers/fsl_common.o ./drivers/fsl_common_arm.o ./drivers/fsl_ctimer.o ./drivers/fsl_dac.o ./drivers/fsl_gpio.o ./drivers/fsl_i2c.o ./drivers/fsl_mrt.o ./drivers/fsl_power.o ./drivers/fsl_reset.o ./drivers/fsl_sctimer.o ./drivers/fsl_spi.o ./drivers/fsl_swm.o ./drivers/fsl_usart.o  ./device/system_LPC845.o  ./component/uart/fsl_adapter_miniusart.o  ./board/board.o ./board/clock_config.o ./board/peripherals.o ./board/pin_mux.o   
+Memory region         Used Size  Region Size  %age Used
+   PROGRAM_FLASH:       49372 B        64 KB     75.34%
+            SRAM:        1712 B      16352 B     10.47%
+        IAP_SRAM:           0 B         32 B      0.00%
+Finished building target: NukElk_uC_LPC845.axf
+ 
+Performing post-build steps
+arm-none-eabi-size "NukElk_uC_LPC845.axf"; # arm-none-eabi-objcopy -v -O binary "NukElk_uC_LPC845.axf" "NukElk_uC_LPC845.bin" ; # checksum -p LPC845 -d "NukElk_uC_LPC845.bin";
+   text	   data	    bss	    dec	    hex	filename
+  49348	     24	   1688	  51060	   c774	NukElk_uC_LPC845.axf
+ 
+13:43:53 **** Incremental Build of configuration Debug for project NukElk_uC_LPC845 ****
+make -r -j4 all 
+Building file: ../source/NukElk_uC_LPC845.c
+Invoking: MCU C Compiler
+arm-none-eabi-gcc -D__REDLIB__ -DCPU_LPC845M301JBD48 -DCPU_LPC845M301JBD48_cm0plus -DSDK_DEBUGCONSOLE=1 -DPRINTF_FLOAT_ENABLE=1 -D__MCUXPRESSO -D__USE_CMSIS -DDEBUG -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\component\uart" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\drivers" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\CMSIS" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\CMSIS\m-profile" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\device" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\utilities\debug_console_lite" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\utilities\str" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\utilities" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\device\periph2" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\board" -I"F:\School\BME-VIK_inf\Semester_VII\NukElk\MCU\NukElk_uC_LPC845\source" -O0 -fno-common -g3 -gdwarf-4 -Wall -c -ffunction-sections -fdata-sections -fno-builtin -fmerge-constants -fmacro-prefix-map="../source/"= -mcpu=cortex-m0plus -mthumb -D__REDLIB__ -fstack-usage -specs=redlib.specs -MMD -MP -MF"source/NukElk_uC_LPC845.d" -MT"source/NukElk_uC_LPC845.o" -MT"source/NukElk_uC_LPC845.d" -o "source/NukElk_uC_LPC845.o" "../source/NukElk_uC_LPC845.c"
+../source/NukElk_uC_LPC845.c: In function 'main':
+../source/NukElk_uC_LPC845.c:525:88: warning: passing argument 3 of 'USART_parse' discards 'volatile' qualifier from pointer target type [-Wdiscarded-qualifiers]
+  525 |                                         uint8_t code = USART_parse(str_in, &new_value, &en_reg); //Parse valid USART commands.
+      |                                                                                        ^~~~~~~
+In file included from ../source/NukElk_uC_LPC845.c:26:
+../source/apis/USART_API.h:87:79: note: expected 'const uint8_t * const' {aka 'const unsigned char * const'} but argument is of type 'volatile uint8_t *' {aka 'volatile unsigned char *'}
+   87 | uint8_t USART_parse(const char* buff, double* set_value, const uint8_t* const logd_in);
+      |                                                          ~~~~~~~~~~~~~~~~~~~~~^~~~~~~
+Finished building: ../source/NukElk_uC_LPC845.c
+ 
+Building target: NukElk_uC_LPC845.axf
+Invoking: MCU Linker
+arm-none-eabi-gcc -nostdlib -Xlinker -Map="NukElk_uC_LPC845.map" -Xlinker --gc-sections -Xlinker -print-memory-usage -Xlinker --sort-section=alignment -Xlinker --cref -mcpu=cortex-m0plus -mthumb -T NukElk_uC_LPC845_Debug.ld -o "NukElk_uC_LPC845.axf" ./utilities/str/fsl_str.o  ./utilities/debug_console_lite/fsl_debug_console.o  ./utilities/fsl_assert.o  ./startup/startup_lpc845.o  ./source/ic_drivers/SSD1309.o ./source/ic_drivers/fonts.o  ./source/apis/BCD_API.o ./source/apis/SPI_API.o ./source/apis/USART_API.o  ./source/NukElk_uC_LPC845.o ./source/datatypes.o ./source/mtb.o ./source/semihost_hardfault.o  ./drivers/fsl_acomp.o ./drivers/fsl_adc.o ./drivers/fsl_clock.o ./drivers/fsl_common.o ./drivers/fsl_common_arm.o ./drivers/fsl_ctimer.o ./drivers/fsl_dac.o ./drivers/fsl_gpio.o ./drivers/fsl_i2c.o ./drivers/fsl_mrt.o ./drivers/fsl_power.o ./drivers/fsl_reset.o ./drivers/fsl_sctimer.o ./drivers/fsl_spi.o ./drivers/fsl_swm.o ./drivers/fsl_usart.o  ./device/system_LPC845.o  ./component/uart/fsl_adapter_miniusart.o  ./board/board.o ./board/clock_config.o ./board/peripherals.o ./board/pin_mux.o   
+Memory region         Used Size  Region Size  %age Used
+   PROGRAM_FLASH:       49404 B        64 KB     75.38%
+            SRAM:        1712 B      16352 B     10.47%
+        IAP_SRAM:           0 B         32 B      0.00%
+Finished building target: NukElk_uC_LPC845.axf
+ 
+Performing post-build steps
+arm-none-eabi-size "NukElk_uC_LPC845.axf"; # arm-none-eabi-objcopy -v -O binary "NukElk_uC_LPC845.axf" "NukElk_uC_LPC845.bin" ; # checksum -p LPC845 -d "NukElk_uC_LPC845.bin";
+   text	   data	    bss	    dec	    hex	filename
+  49380	     24	   1688	  51092	   c794	NukElk_uC_LPC845.axf
+ 
