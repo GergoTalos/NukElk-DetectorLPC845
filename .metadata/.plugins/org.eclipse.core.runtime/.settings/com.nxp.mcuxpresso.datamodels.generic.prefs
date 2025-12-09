@@ -1,0 +1,4 @@
+eclipse.preferences.version=1
+sdk.component.overwrite.ask=true
+sdk.component.overwrite.policy=Keep existing
+sdk.paths.pref=;C\:\\Users\\talos\\mcuxpresso\\02\\SDKPackages

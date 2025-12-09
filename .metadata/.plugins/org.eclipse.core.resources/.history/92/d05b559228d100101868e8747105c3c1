@@ -1,0 +1,49 @@
+/*
+ * BCD_API.h
+ *
+ *  Created on: 20 Nov 2025
+ *      Author: talos
+ */
+
+#ifndef APIS_BCD_API_H_
+#define APIS_BCD_API_H_
+
+#include "stdint.h"
+
+/**
+ * Writes code to the BCD bus.
+ * Lower 4 bits are used.
+ */
+uint8_t BCD_digit(uint8_t digit);
+
+/**
+ * int to bcd for two digit, positive only displays
+ */
+uint8_t BCD_pint2(int8_t num);
+
+/**
+ * Initializes the 7 segment display by lighting all the segments up, then blanking them.
+ */
+void BCD_init(void);
+
+/**
+ * Blanks all the digits
+ */
+void BCD_blank(void);
+
+/**
+ * Rising edge
+ */
+void BCD_cnt_up(void);
+
+/**
+ * Rising edge
+ */
+void BCD_cnt_dw(void);
+
+/**
+ * Rising edge
+ */
+void BCD_clr(void);
+
+#endif /* APIS_BCD_API_H_ */

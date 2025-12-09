@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Delete 2 resources" deleteContents="false" description="Delete 2 resources" element1="/NukElk_uC_LPC845/source/ic_drivers/M24C32_EEPROM_I2C.c" element2="/NukElk_uC_LPC845/source/ic_drivers/M24C32_EEPROM_I2C.h" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="2" stamp="1764838662897"/>
+</session>

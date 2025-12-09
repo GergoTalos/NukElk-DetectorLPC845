@@ -1,0 +1,141 @@
+/**
+ * BCD_LOGIC.c
+ *
+ *  Created on: 20 Nov 2025
+ *      Author: talos
+ *
+ *  BCD logic implementation.
+ *  Pins that use inverted output
+ *  	are confifured as normal, reverse logic used.
+ */
+
+//#include "BCD_LOGIC.h"
+#include "pin_mux.h"
+#include "fsl_gpio.h"
+#include "datatypes.h"
+
+
+/* Common, not used this time
+#define BCD_UP(X) GPIO_PinWrite(BCD_UP_GPIO, BCD_UP_PORT, BCD_UP_PIN, X);
+#define BCD_DW(X) GPIO_PinWrite(BCD_DW_GPIO, BCD_DW_PORT, BCD_DW_PIN, X);
+#define BCD_CLR(X) GPIO_PinWrite(BCD_CLR_GPIO, BCD_CLR_PORT, BCD_CLR_PIN, X);
+*/
+
+#define BCD_A(X) GPIO_PinWrite(BCD_A_GPIO, BCD_A_PORT, BCD_A_PIN, X);
+#define BCD_B(X) GPIO_PinWrite(BCD_B_GPIO, BCD_B_PORT, BCD_B_PIN, X);
+#define BCD_C(X) GPIO_PinWrite(BCD_C_GPIO, BCD_C_PORT, BCD_C_PIN, X);
+#define BCD_D(X) GPIO_PinWrite(BCD_D_GPIO, BCD_D_PORT, BCD_D_PIN, X);
+
+/* Specific for the numbers of digits */
+#define BCD_LOAD_0(X) GPIO_PinWrite(BCD_LOAD_0_GPIO, BCD_LOAD_0_PORT, BCD_LOAD_0_PIN, X);
+#define BCD_LOAD_1(X) GPIO_PinWrite(BCD_LOAD_1_GPIO, BCD_LOAD_1_PORT, BCD_LOAD_1_PIN, X);
+
+/**
+ * For TIL308 7 segment display with built-in logic
+ * Codes:
+ * 	0-9
+ * 	A:		10
+ * 	MINUS:	11
+ * 	C:		12
+ * 	BLANK:	13
+ * 	E:		14
+ * 	F:		15
+ * 	BLank display(s)
+ * 	Light Test display(s) overrides lathes
+ * 	Decimal Point for each display
+ * 	LS pulse duration = min. 45ns
+ * 	Latch data inputs setup time = min. 60ns
+ * 	Hold time is 0ns (theoretically)
+ */
+//#define BCD_BL(X) GPIO_PinWrite(BCD_BL_GPIO, BCD_BL_PORT, BCD_BL_PIN, X);
+#define BCD_LT(X) GPIO_PinWrite(BCD_LT_GPIO, BCD_LT_PORT, BCD_LT_PIN, X); // Light Test pin
+#define BCD_DP_0(X) GPIO_PinWrite(BCD_DP_0_GPIO, BCD_DP_0_PORT, BCD_DP_0_PIN, X); // Decimal point pin
+//#define BCD_DP_1(X) GPIO_PinWrite(BCD_DP_1_GPIO, BCD_DP_1_PORT, BCD_DP_1_PIN, X); // Decimal point pin
+
+#define BLANK_CODE 13 //blanks the display
+#define BCD_DELAY 2 //~ 66ns, ~2 cycles at 30MHz
+#define BCD_DELAY_SETUP 1000000 //1s
+
+/**
+ * Lower 4 bits are used.
+ */
+uint8_t BCD_digit(uint8_t digit) {
+	uint8_t ret = 1;
+	if (digit < 16) {
+		BCD_A(0x01 & digit);
+		BCD_B((0x02 & digit) >> 1);
+		BCD_C((0x04 & digit) >> 2);
+		BCD_D((0x08 & digit) >> 3);
+		ret = 0;
+	}
+	return ret;
+}
+
+
+/**
+ * int to bcd for two digit, positive only displays
+ */
+uint8_t BCD_pint2(int8_t num) {
+	uint8_t ret = 1;
+	if (num < 100 && num > -1) {
+		BCD_digit(num % 10);
+		BCD_LOAD_0(0);
+		num /= 10; // the cpu doesn't have to wait.
+		BCD_LOAD_0(1);
+		BCD_digit(num % 10);
+		BCD_LOAD_1(0);
+		nop(BCD_DELAY);
+		BCD_LOAD_1(1);
+		ret = 0;
+	}
+	return ret;
+}
+
+/**
+ * Blanks all digits.
+ */
+void BCD_blank(void) {
+	BCD_digit(13);
+	BCD_LOAD_0(0);
+	BCD_LOAD_1(0);
+	BCD_LOAD_0(1);
+	BCD_LOAD_1(1);
+}
+
+/*
+ * Initialises the 7 segment display, by lighting it up, then blanking it.
+ */
+void BCD_init() {
+	BCD_LT(0); // Lights up, clears
+	BCD_digit(BLANK_CODE); //Set blank, but no effect
+	nop(BCD_DELAY_SETUP);
+	BCD_LOAD_0(0); // Load blank
+	BCD_LOAD_1(0);
+	BCD_LT(1);
+	BCD_LOAD_0(1);
+	BCD_LOAD_1(1);
+	nop(BCD_DELAY_SETUP);
+}
+
+
+/**
+ * Rising edge
+
+void BCD_cnt_up() {
+	BCD_UP(1);
+	//nop(1);
+	BCD_UP(0);
+}
+
+void BCD_cnt_dw() {
+	BCD_DW(1);
+	//nop(1);
+	BCD_DW(0);
+}
+
+void BCD_clr() {
+	BCD_CLR(1);
+	//nop(1);
+	BCD_DW(0);
+}
+*/
