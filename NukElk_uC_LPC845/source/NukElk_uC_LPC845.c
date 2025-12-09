@@ -147,7 +147,7 @@ uint8_t set_vars(volatile uint32_t *vars, double dvalue, Vars_name name) {
 			break;
 		case min_offset_D:
 			vars[min_offset_D] = (uint32_t)dvalue;
-			vars[min_offset_V] = floor(dvalue*(VREFP_MA_OUT_V/1024));
+			vars[min_offset_V] = floor(dvalue*(VREFP_MA_OUT_V/1024)*PAR_MULTIPLIER);
 			meth_out_value(vars,vars[cps]);
 			ret = 0;
 			break;
@@ -549,8 +549,9 @@ int main(void) {
 							strcpy(special,"\r\n\tNo such command!\r\n\r\n");
 						}
 						break;
-						case 93:
+						case 93: //???
 						{
+							strcpy(special,"\r\n\tNo such parameter!\r\n\r\n");
 						}
 						break;
 						case 96:
