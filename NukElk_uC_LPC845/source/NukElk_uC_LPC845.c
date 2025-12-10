@@ -45,26 +45,17 @@
 # define LOOP_INTERVAL 10U // ms
 # define MEASURE_INTERVAL 1000U // 1s
 # define USART_INTERVAL 20U // ms
-//# define SIREN_INTERVAL 50U // ms
 # define MSR_INTERVAL_CYCLES 30000000 // 30MHz => 1s
 volatile uint32_t systick_counter = LOOP_INTERVAL;
-//volatile uint32_t measure_counter = MEASURE_INTERVAL;
 volatile uint32_t usart_counter = USART_INTERVAL;
-//volatile uint32_t siren_counter = SIREN_INTERVAL;
 // Callback for Systick Interrupt
 void SysTick_Handler(void) {
     if (systick_counter != 0U) {
         systick_counter--;
     }
-    /*if (measure_counter != 0U) {
-    	measure_counter--;
-    }*/
     if (usart_counter != 0U) {
     	usart_counter--;
     }
-    /*if (siren_counter != 0U) {
-    	siren_counter--;
-	}*/
 }
 
 /**
@@ -129,8 +120,6 @@ uint8_t set_vars(volatile uint32_t *vars, double dvalue, Vars_name name) {
 	switch(name) {
 		case cps:
 		case siren_cps:
-		//case min_mA_cps:
-		//case max_mA_cps:
 			vars[name] = (uint32_t)(dvalue);
 			ret = 0;
 		case min_mA_cps:
@@ -163,7 +152,6 @@ uint8_t set_vars(volatile uint32_t *vars, double dvalue, Vars_name name) {
 			dvalue /= PAR_MULTIPLIER;
 			vars[out_value_mA] = ceil(((dvalue-MIN_MA_OUT_V)/(MAX_MA_OUT_V-MIN_MA_OUT_V))*16+4);
 			dvalue /= (VREFP_MA_OUT_V/1024);
-			//double tmp = ((vars[max_mA_cps]-vars[min_mA_cps])/(1024-vars[min_offset_D]));
 			vars[out_value_reg] = floor((dvalue-vars[min_offset_D])*tmp);
 			ret = 0;
 			break;
@@ -172,8 +160,7 @@ uint8_t set_vars(volatile uint32_t *vars, double dvalue, Vars_name name) {
 			dvalue = (((dvalue-4)/16)*(MAX_MA_OUT_V-MIN_MA_OUT_V)+MIN_MA_OUT_V);
 			vars[out_value_V] = floor(dvalue*PAR_MULTIPLIER);
 			dvalue /= (VREFP_MA_OUT_V/1024);
-			//double tmp = ((vars[max_mA_cps]-vars[min_mA_cps])/(1024-vars[min_offset_D]));
-			vars[out_value_reg] = floor((dvalue-vars[min_offset_D])*tmp); // floor(dvalue);
+			vars[out_value_reg] = floor((dvalue-vars[min_offset_D])*tmp);
 			ret = 0;
 			break;
 		default:
@@ -250,23 +237,6 @@ uint8_t check_vars(volatile uint32_t *vars, double *dvalue, Vars_name name) {
  * @parameter out_value, double; the cps value to calculate from
  */
 void meth_out_value(volatile uint32_t *vars, double out_val) {
-	//double out_val = cps;//0;
-	/*Semafor_meth: // Read needed value, the rest won't affect it anyway
-	if (!signal) {
-		signal = 1;
-		//out_val = (double)vars[cps];
-		out_val = vars[cps];
-		signal = 0;
-	}
-	else {
-		goto Semafor_meth;
-	}
-	if (out_val > vars[siren_cps]) {
-		en_reg |= 0x10; //enable siren
-	}
-	else {
-		en_reg &= 0xEF; //disable siren
-	}*/
 	// Corrected cps; between min and max cps with offset.
 	// CAN BE OVER 1023, but the DAC's max is 1023.
 	double tmp = (double)(vars[max_mA_cps]-vars[min_mA_cps])/(1024-vars[min_offset_D]);
@@ -456,17 +426,10 @@ int main(void) {
         	systick_counter = LOOP_INTERVAL; //Reset Loop interval
 
         	/* Perform enabled functions */
-        	/*if (measure_counter == 0U) {
-				measure_counter = MSR_INTERVAL;
-				if (en_reg & 0x01) {
-					read_cps(Vars+cps);
-				}
-        	}*/
         	if (en_reg & 0x40) { // math: Calculate Other parameters based on cps.
         		Semafor_meth: // Read needed value, the rest won't affect it anyway
 				if (!signal) {
 					signal = 1;
-					//tmp_cps = (double)vars[cps];
 					tmp_cps = vars[cps];
 					signal = 0;
 				}
@@ -497,7 +460,6 @@ int main(void) {
 				OLED_clear_screen();
 			}
 			if (en_reg & 0x08) { // 7Seg
-				//BCD_pint2(20 < vars[out_value_mA] ? 20 : vars[out_value_mA]); // "20mA" (1023, or 3.3V) is the max on the DAC, but the operator needs to know, that cps is over the upper limit
 				BCD_pint2(vars[out_value_mA]);
 			}
 			else {
@@ -505,17 +467,6 @@ int main(void) {
 			}
         	/* Enable Siren */
         	GPIO_PinWrite(SIREN_T_GPIO,SIREN_T_PORT,SIREN_T_PIN,(en_reg & 0x10) >> 4); //Shift, 'cause only accepts 0 and 1.
-			/*if (en_reg & 0x10) {
-				if (siren_counter == 0U) {
-					SCTIMER_UpdatePwmDutycycle(SCT0_PERIPHERAL, kSCTIMER_Out_3, siren_percent, SCT0_pwmEvent[1]);
-					siren_percent ^= 0x02;
-				}
-				else { // Turn siren off
-					SCTIMER_UpdatePwmDutycycle(SCT0_PERIPHERAL, kSCTIMER_Out_3, 0, SCT0_pwmEvent[1]);
-				}
-				siren_counter = LOOP_INTERVAL; //Reset Loop interval
-        	}
-			*/
 			/* Check USART, when SysTick counter usart is zero */
 			if (usart_counter == 0U) {
 				/* Process USART */
@@ -549,7 +500,7 @@ int main(void) {
 							strcpy(special,"\r\n\tNo such command!\r\n\r\n");
 						}
 						break;
-						case 93: //???
+						case 93:
 						{
 							strcpy(special,"\r\n\tNo such parameter!\r\n\r\n");
 						}
@@ -598,116 +549,18 @@ int main(void) {
 					sprintf(str_out,"\x1b[%d;%df\x1b[2J", 0,0);
 					PrintUSART0_NB(str_out);
 					// Print special message
-					//sprintf(str_out,"\r\n%s\r\n",special);
-					PrintUSART0_NB(special);//
+					PrintUSART0_NB(special);
 					special[0] = '\0'; // clear
 					// Print parameters
-					/*sprintf(str_out,
-							"\r\nParams:\x1b[19GValue:\r\n"
-							"\tCPS:\r\n"
-							//"\x1b[25G"
-							//"%5d\r\n"
-							"\tmin_mA_CPS:\r\n"
-							//"\x1b[25G"
-							//"%5d\r\n"
-							"\tmax_mA_CPS:\r\n"
-							//"\x1b[25G"
-							//"%5d\r\n"
-							"\tout_val_R:\r\n"
-							//"\x1b[25G"
-							//"%5d\r\n"
-							"\tout_val_V:\r\n"
-							//"\x1b[25G"
-							//"%5d\r\n"
-							"\tout_val_mA:\r\n"
-							//"\x1b[25G"
-							//"%5d\r\n"
-							"\tmin_offset_V:\r\n"
-							//"\x1b[25G"
-							//"%5d\r\n"
-							"\tmin_offset_D:\r\n"
-							//"\x1b[25G"
-							//"%5d\r\n"
-							"\tsiren_cps:\r\n"
-							//"\x1b[25G"
-							//"%5d\r\n"
-							"Enabled:\r\n"
-							"\tcps_in:\r\n"
-							"\tmA_out:\r\n"
-							"\toled:\r\n"
-							"\t7segment:\r\n"
-							"\tsiren:\r\n"
-							"\tUSART:\r\n"
-							//,
-							//vars[cps],vars[min_mA_cps],vars[max_mA_cps],vars[out_value_reg], vars[out_value_V]/100,vars[out_value_mA],vars[min_offset_V]/100,vars[min_offset_D],vars[siren_cps]
-							);*/
-					PrintUSART0_NB(usart_text);//str_out
+					PrintUSART0_NB(usart_text);
 					usart_disp_txt = 0;
 				}
-				//else {
 				float tmp0 = (float)vars[out_value_V]/PAR_MULTIPLIER;
 				float tmp1 = (float)vars[min_offset_V]/PAR_MULTIPLIER;
 				PrintUSART0_NB("\x1b[60"); // are you there?
-				// Print special message
-				//sprintf(str_out,"\r\n%s\r\n",special);
-				//PrintUSART0_NB(str_out);
-				//special[0] = '\0'; // clear
-
+				//Print values
 				sprintf(str_out,
-						usart_values
-				/*	"\x1b[ ? 25 l"
-					"\x1b[s"
-					"\x1b[16A"
-						"\x1b[25G"
-						"%5d"
-					"\x1b[1B"
-						"\x1b[25G"
-						"%5d"
-					"\x1b[1B"
-						"\x1b[25G"
-						"%5d"
-					"\x1b[1B"
-						"\x1b[25G"
-						"%5d"
-					"\x1b[1B"
-						"\x1b[25G"
-						"%5.2f"
-					"\x1b[1B"
-						"\x1b[25G"
-						"%5d"
-					"\x1b[1B"
-						"\x1b[25G"
-						"%5.2f"
-					"\x1b[1B"
-						"\x1b[25G"
-						"%5d"
-					"\x1b[1B"
-						"\x1b[25G"
-						"%5d"
-
-					"\x1b[2B"
-						"\x1b[29G"
-						"%1hd"
-					"\x1b[1B"
-						"\x1b[29G"
-						"%1hd"
-					"\x1b[1B"
-						"\x1b[29G"
-						"%1hd"
-					"\x1b[1B"
-						"\x1b[29G"
-						"%1hd"
-					"\x1b[1B"
-						"\x1b[29G"
-						"%1hd"
-					"\x1b[1B"
-						"\x1b[29G"
-						"%1hd"
-
-					"\x1b[u"
-					"\x1b[ ? 25 h"
-					*/
-					,
+						usart_values,
 					vars[cps],
 					vars[min_mA_cps],
 					vars[max_mA_cps],
@@ -727,7 +580,6 @@ int main(void) {
 					((en_reg & 0x80) >> 7)
 						 );
 				PrintUSART0_NB(str_out);
-				//}
         	}
         	//loop cont.
         }
