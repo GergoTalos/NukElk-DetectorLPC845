@@ -1,12 +1,11 @@
 # GM-csöves detektor #
 ## Tekes János,Tálos Gergő ##
 
-Tekes János:
++ Tekes János:
 	HW dokumentáció:
 	 + /DOC/GM-detektor_Hardver-dok.pdf
 
-
-Tálos Gergő:
++ Tálos Gergő:
 	HW a szoftverhez:
 	 + LPC845-BRK
 	 + 2db TIL308 7 szegmenses kijelző
