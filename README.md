@@ -4,7 +4,7 @@
 Tekes János:
 	HW dokumentáció:
 	 + /DOC/GM-detektor_Hardver-dok.pdf
-	 
+
 
 Tálos Gergő:
 	HW a szoftverhez:
